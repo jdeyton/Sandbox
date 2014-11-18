@@ -7,3 +7,5 @@ Export-Package: com.bar.foo.javafx.test
 Import-Package: org.eclipse.swt.graphics,
  org.eclipse.swt.layout,
  org.eclipse.swt.widgets
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+JavaFX-Feature-Proxy: None
