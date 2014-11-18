@@ -1,18 +1,22 @@
-package com.bar.foo.javafx.app;
-
-//
-//Xform.java is a class that extends the Group class. It is used in the 
-//MoleculeSampleApp application that is built using the Getting Started with JavaFX
-//3D Graphics tutorial. The method allows you to add your own transforms and rotation.
-//
+package com.bar.foo.javafx;
 
 import javafx.scene.Group;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 
-public class Xform extends Group {
+/**
+ * This class provides a {@link Group} for 3D-based objects. It maintains added
+ * 3D transformations so they are not re-calculated by the JavaFX rendering
+ * engine.
+ * 
+ * @author Jordan Deyton
+ *
+ */
+public class Node extends Group {
 
+	// TODO Clean this!!! This code based on Xform is lousy!
+	
 	public enum RotateOrder {
 		XYZ, XZY, YXZ, YZX, ZXY, ZYX
 	}
@@ -34,12 +38,12 @@ public class Xform extends Group {
 	}
 	public Scale s = new Scale();
 
-	public Xform() {
+	public Node() {
 		super();
 		getTransforms().addAll(t, rz, ry, rx, s);
 	}
 
-	public Xform(RotateOrder rotateOrder) {
+	public Node(RotateOrder rotateOrder) {
 		super();
 		// choose the order of rotations based on the rotateOrder
 		switch (rotateOrder) {

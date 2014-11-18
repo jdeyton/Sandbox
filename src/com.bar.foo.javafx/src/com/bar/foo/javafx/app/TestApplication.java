@@ -6,14 +6,14 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
-import javafx.stage.Stage;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.StrokeType;
-import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import javafx.stage.Stage;
+
+import com.bar.foo.javafx.Node;
+import com.bar.foo.javafx.RootNode;
 
 public class TestApplication extends Application {
 
@@ -21,13 +21,9 @@ public class TestApplication extends Application {
 	private final Group root;
 
 	private final PerspectiveCamera camera = new PerspectiveCamera(true);
-
-	private static final double width = 1024;
-	private static final double height = 768;
 	
 	public TestApplication() {
-		Xform root = new Xform();
-		root.rx.setAngle(180.0);
+		Node root = new RootNode();
 		scene = new Scene(root, 0.0, 0.0, true, SceneAntialiasing.BALANCED);
 		scene.setFill(Color.BLACK);
 		this.root = root;
