@@ -2,18 +2,35 @@ package com.bar.foo.javafx.app;
 
 import javafx.application.Application;
 import javafx.scene.Group;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Material;
+import javafx.scene.paint.PhongMaterial;
 import javafx.stage.Stage;
+import javafx.scene.shape.Box;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.StrokeType;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
 
 public class TestApplication extends Application {
 
 	private final Scene scene;
 	private final Group root;
 
+	private final PerspectiveCamera camera = new PerspectiveCamera(true);
+
+	private static final double width = 1024;
+	private static final double height = 768;
+	
 	public TestApplication() {
-		root = new Group();
-		scene = new Scene(root, Color.BLACK);
+		Xform root = new Xform();
+		root.rx.setAngle(180.0);
+		scene = new Scene(root, 0.0, 0.0, true, SceneAntialiasing.BALANCED);
+		scene.setFill(Color.BLACK);
+		this.root = root;
 	}
 
 	@Override
@@ -31,6 +48,7 @@ public class TestApplication extends Application {
 
 		// Initialize the application.
 		initScene();
+		initCamera();
 
 		// Opens the Application window.
 		primaryStage.show();
@@ -48,10 +66,51 @@ public class TestApplication extends Application {
 	}
 
 	public void initScene() {
-		// TODO
+		Box box = new Box(100.0, 100.0, 100.0);
+		PhongMaterial material = new PhongMaterial(Color.GRAY);
+		material.setSpecularColor(Color.DARKBLUE);
+		box.setMaterial(material);
+		box.getTransforms().add(new Translate(300.0, -300.0, 100.0));
+		root.getChildren().add(box);
+
+		Circle circle = new Circle(100, Color.WHITE);
+//		circle.getTransforms().add(new Translate(100.0, -100.0));
+		root.getChildren().add(circle);
+	}
+
+	public void initCamera() {
+		
+		
+		// camera.setNearClip(CAMERA_NEAR_CLIP);
+		// camera.setFarClip(CAMERA_FAR_CLIP);
+		// camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
+
+		// Add the camera to the scene. We can only have one at a time.
+		scene.setCamera(camera);
+
+		// Add the camera to the scene graph.
+		root.getChildren().add(camera);
+		
+		camera.setNearClip(0.1);
+		camera.setFarClip(10000.0);
+		
+//		camera.getTransforms().add(new Translate(0.0, 0.0, 500.0));
+		camera.setTranslateZ(-1000);
+		
+		// Rotate rotation = new Rotate();
+		// rotation.setAxis(Rotate.Z_AXIS);
+		// rotation.setAngle(180.0);
+
+		// root.getTransforms().add(rotation);
+
+		return;
 	}
 
 	public void disposeScene() {
+		// TODO
+	}
+
+	public void disposeCamera() {
 		// TODO
 	}
 
