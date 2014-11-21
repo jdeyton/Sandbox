@@ -5,10 +5,13 @@ package com.bar.foo.javafx.test;
 
 import javafx.application.Platform;
 import javafx.embed.swt.FXCanvas;
+import javafx.event.EventHandler;
 import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -28,6 +31,7 @@ public class EmbeddedView {
 
 	private final Node root;
 	private final Camera camera;
+	private final Color color;
 
 	private FXCanvas canvas;
 	// Scenes must be constructed or modified on the Application thread.
@@ -36,6 +40,7 @@ public class EmbeddedView {
 	private static final double radius = 100;
 
 	public EmbeddedView(Node parent, Color color) {
+		this.color = color;
 
 		// Set up the root node.
 		root = new Node();
@@ -61,7 +66,7 @@ public class EmbeddedView {
 		camera.setTranslateX(radius * 2.0); // Move the camera to the right.
 		camera.getTransforms().add(new Rotate(180.0, Rotate.X_AXIS));
 		cameraNode.getChildren().add(camera);
-
+		
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.
 			// Normally, you should check Platform.isFxApplicationThread() first
@@ -87,6 +92,17 @@ public class EmbeddedView {
 			scene.setCamera(camera);
 			canvas.setScene(scene);
 			composite = canvas;
+			
+			EventHandler<KeyEvent> onSpace = new EventHandler<KeyEvent>() {
+				@Override
+				public void handle(KeyEvent event) {
+					if (event.getCode() == KeyCode.SPACE) {
+						System.out.println("SPAAAAAAAAAAACE GHOOOOOOOOOOOOOST");
+						System.out.println(color);
+					}
+				}
+			};
+			scene.setOnKeyPressed(onSpace);
 		}
 		return composite;
 	}
