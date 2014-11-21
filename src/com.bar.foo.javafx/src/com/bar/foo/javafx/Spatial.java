@@ -5,6 +5,7 @@ package com.bar.foo.javafx;
 
 import javafx.scene.Group;
 
+import com.bar.foo.math.FloatMath;
 import com.sun.javafx.geom.Matrix3f;
 import com.sun.javafx.geom.Quat4f;
 import com.sun.javafx.geom.Vec3f;

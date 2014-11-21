@@ -10,24 +10,31 @@ import com.bar.foo.javafx.app.TestApplication;
 
 public class TestLauncher {
 
+	private Shell shell;
+
 	public static void main(String[] args) {
 		Application.launch(TestApplication.class, args);
 	}
 
-	private Shell createShell() {
+	public TestLauncher() {
 		// Create the Display.
 		Display display = new Display();
 		// Create the Shell (window).
-		Shell shell = new Shell(display);
-		shell.setText("JavaFX Test Launcher");
+		shell = new Shell(display);
+		shell.setText("Test");
 		shell.setSize(1024, 768);
 		shell.setLayout(new FillLayout());
 
+		return;
+	}
+
+	public Shell getShell() {
 		return shell;
 	}
 
-	private void runShell(Shell shell) {
+	public void openShell() {
 
+		shell.open();
 		Display display = shell.getDisplay();
 
 		// SOP UI loop.
