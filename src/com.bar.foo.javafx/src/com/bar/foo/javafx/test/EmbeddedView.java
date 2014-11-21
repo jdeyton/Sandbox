@@ -8,6 +8,7 @@ import javafx.embed.swt.FXCanvas;
 import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -76,7 +77,7 @@ public class EmbeddedView {
 		Composite composite = null;
 		if (canvas == null) {
 			canvas = new FXCanvas(parent, SWT.BORDER);
-			scene = new Scene(root, Color.BLACK);
+			scene = new Scene(root, 0.0, 0.0, true, SceneAntialiasing.BALANCED);
 			scene.setCamera(camera);
 			canvas.setScene(scene);
 			composite = canvas;
