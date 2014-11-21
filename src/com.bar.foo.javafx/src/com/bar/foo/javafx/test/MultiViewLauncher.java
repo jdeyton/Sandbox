@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Rotate;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -21,13 +22,16 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.bar.foo.javafx.Node;
+
 /**
  * @author Jordan Deyton
  *
  */
 public class MultiViewLauncher {
 
-	private static int count = 0;
+	public static int count = 0;
+	public static Node stageRoot;
 
 	public static void main(String[] args) {
 
@@ -92,6 +96,14 @@ public class MultiViewLauncher {
 
 		rightComposite.setLayout(new GridLayout());
 
+		// Create a view of the entire scene.
+		EmbeddedView stageView = new EmbeddedView(null, Color.SILVER);
+		Composite stageComposite = stageView.createComposite(rightComposite);
+		stageComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		stageRoot = stageView.getRoot();
+		stageRoot.setRx(180.0);
+		rightComposite.layout();
+		
 		// Add the button listeners for the Add and Delete buttons.
 		add.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -120,7 +132,7 @@ public class MultiViewLauncher {
 					rightComposite.setLayout(new GridLayout(columns, true));
 
 					// Create the view.
-					EmbeddedView view = new EmbeddedView(color);
+					EmbeddedView view = new EmbeddedView(stageRoot, color);
 					Composite viewComposite = view
 							.createComposite(rightComposite);
 					viewComposite.setLayoutData(new GridData(SWT.FILL,
@@ -167,7 +179,13 @@ public class MultiViewLauncher {
 		launcher.openShell();
 
 		// Close any shell-dependent resources here.
-
+		// The underlying canvases should already be disposed, but we should
+		// dispose any other resources managed by the EmbeddedViews.
+		for (EmbeddedView view : viewMap.values()) {
+			view.dispose();
+		}
+		stageView.dispose();
+		
 		return;
 	}
 
