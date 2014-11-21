@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Random;
 
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Rotate;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -101,7 +100,6 @@ public class MultiViewLauncher {
 		Composite stageComposite = stageView.createComposite(rightComposite);
 		stageComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		stageRoot = stageView.getRoot();
-		stageRoot.setRx(180.0);
 		rightComposite.layout();
 		
 		// Add the button listeners for the Add and Delete buttons.

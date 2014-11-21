@@ -12,6 +12,7 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
 import org.eclipse.swt.SWT;
@@ -44,17 +45,22 @@ public class EmbeddedView {
 		PhongMaterial material = new PhongMaterial(color);
 		material.setSpecularColor(Color.WHITE);
 		box.setMaterial(material);
+		int count = MultiViewLauncher.count;
 		box.getTransforms().add(
-				new Translate(radius * MultiViewLauncher.count, -100, 0.0));
+				new Translate(radius * count, radius * count, radius * count));
 		root.getChildren().add(box);
 
 		// Set up the view camera.
+		Node cameraNode = new Node();
+//		cameraNode.setRotateX(180.0); // An alternative to rotating the camera.
+		root.getChildren().add(cameraNode);
 		camera = new PerspectiveCamera(true);
 		camera.setNearClip(0.1);
 		camera.setFarClip(10000.0);
-		camera.setTranslateZ(-800.0);
-		camera.setTranslateX(radius * 2.0);
-		root.getChildren().add(camera);
+		cameraNode.setTranslateZ(1000.0);
+		camera.setTranslateX(radius * 2.0); // Move the camera to the right.
+		camera.getTransforms().add(new Rotate(180.0, Rotate.X_AXIS));
+		cameraNode.getChildren().add(camera);
 
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.
