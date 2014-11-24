@@ -23,11 +23,11 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.bar.foo.javafx.Node;
 import com.bar.foo.javafx.input.ControlManager;
+import com.bar.foo.javafx.input.KeyAnalogAction;
+import com.bar.foo.javafx.input.KeyToggleAction;
+import com.bar.foo.javafx.input.MouseAnalogAction;
 import com.bar.foo.javafx.input.MouseCode;
-import com.bar.foo.javafx.input.common.KeyAnalogAction;
-import com.bar.foo.javafx.input.common.KeyToggleAction;
-import com.bar.foo.javafx.input.common.MouseAnalogAction;
-import com.bar.foo.javafx.input.common.MouseToggleAction;
+import com.bar.foo.javafx.input.MouseToggleAction;
 
 /**
  * @author Jordan Deyton

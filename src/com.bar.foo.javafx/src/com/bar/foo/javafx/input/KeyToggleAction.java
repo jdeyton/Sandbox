@@ -1,11 +1,9 @@
 /**
  * 
  */
-package com.bar.foo.javafx.input.common;
+package com.bar.foo.javafx.input;
 
 import javafx.scene.input.KeyEvent;
-
-import com.bar.foo.javafx.input.ToggleAction;
 
 /**
  * @author Jordan Deyton
