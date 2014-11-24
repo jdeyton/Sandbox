@@ -3,14 +3,13 @@
  */
 package com.bar.foo.javafx.input;
 
-import javafx.event.EventType;
 import javafx.scene.input.MouseEvent;
 
 /**
  * @author Jordan Deyton
  *
  */
-public class MouseActionHandler extends ActionHandler<EventType<MouseEvent>, MouseEvent> {
+public class MouseActionHandler extends ActionHandler<MouseCode, MouseEvent> {
 
 	/*
 	 * (non-Javadoc)
@@ -29,8 +28,8 @@ public class MouseActionHandler extends ActionHandler<EventType<MouseEvent>, Mou
 	 * com.bar.foo.javafx.input.ActionHandler#getTrigger(javafx.event.Event)
 	 */
 	@Override
-	protected EventType<MouseEvent> getTrigger(MouseEvent event) {
-		return (EventType<MouseEvent>) event.getEventType();
+	protected MouseCode getTrigger(MouseEvent event) {
+		return MouseCode.fromMouseEvent(event);
 	}
 
 	/*

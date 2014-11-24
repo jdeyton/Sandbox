@@ -23,8 +23,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.bar.foo.javafx.Node;
 import com.bar.foo.javafx.input.ControlManager;
+import com.bar.foo.javafx.input.MouseCode;
 import com.bar.foo.javafx.input.common.KeyToggleAction;
 import com.bar.foo.javafx.input.common.MouseAnalogAction;
+import com.bar.foo.javafx.input.common.MouseToggleAction;
 
 /**
  * @author Jordan Deyton
@@ -95,10 +97,22 @@ public class EmbeddedView {
 			}
 		});
 		
-		controls.mouse.addAnalog(MouseEvent.MOUSE_MOVED, new MouseAnalogAction() {
+		controls.mouse.addAnalog(MouseCode.MOVE, new MouseAnalogAction() {
 			@Override
 			public void run(float value, float timePerFrame, MouseEvent event) {
 				System.out.println("x,y: " + event.getSceneX() + "," + event.getSceneY());
+			}
+		});
+		
+		controls.mouse.addToggle(MouseCode.BUTTON_PRIMARY, new MouseToggleAction() {
+			@Override
+			public void pressed(float timePerFrame, MouseEvent event) {
+				System.out.println("mouse down...");
+			}
+			
+			@Override
+			public void released(float timePerFrame, MouseEvent event) {
+				System.out.println("mouse up...");
 			}
 		});
 	}
