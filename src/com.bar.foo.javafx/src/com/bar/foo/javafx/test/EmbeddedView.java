@@ -5,7 +5,6 @@ package com.bar.foo.javafx.test;
 
 import javafx.application.Platform;
 import javafx.embed.swt.FXCanvas;
-import javafx.event.EventHandler;
 import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -22,8 +21,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import com.bar.foo.javafx.Node;
-import com.bar.foo.javafx.input.IControlAction;
 import com.bar.foo.javafx.input.ControlManager;
+import com.bar.foo.javafx.input.KeyAction;
 
 /**
  * @author Jordan Deyton
@@ -81,12 +80,16 @@ public class EmbeddedView {
 			});
 		}
 
-		controls.addControl(KeyCode.SPACE, new IControlAction() {
+		controls.addControl(KeyCode.SPACE, new KeyAction() {
 			@Override
-			public void performAction(boolean pressed, float timePerFrame) {
+			public void keyPressed(float timePerFrame, KeyEvent event) {
 				System.out.println("SPAAAAAAAAAAACE GHOOOOOOOOOOOOOST");
-				System.out.println(color);
-				System.out.println(pressed);
+				System.out.println(color);				
+			}
+
+			@Override
+			public void keyReleased(float timePerFrame, KeyEvent event) {
+				System.out.println("Released...");
 			}
 		});
 	}

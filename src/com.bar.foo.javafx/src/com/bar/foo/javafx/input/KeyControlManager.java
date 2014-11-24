@@ -18,15 +18,15 @@ import javafx.scene.input.KeyEvent;
  */
 public class KeyControlManager implements EventHandler<KeyEvent> {
 
-	private final Map<KeyCode, List<IControlAction>> keyControls = new HashMap<KeyCode, List<IControlAction>>();
+	private final Map<KeyCode, List<KeyAction>> keyControls = new HashMap<KeyCode, List<KeyAction>>();
 
-	public boolean addControl(KeyCode code, IControlAction action) {
+	public boolean addControl(KeyCode code, KeyAction action) {
 		boolean added = false;
 		if (code != null && action != null) {
-			List<IControlAction> controls = keyControls.get(code);
+			List<KeyAction> controls = keyControls.get(code);
 			// If necessary, add a new list of control actions to the map.
 			if (controls == null) {
-				controls = new ArrayList<IControlAction>();
+				controls = new ArrayList<KeyAction>();
 				keyControls.put(code, controls);
 			}
 			// We can now add the control.
@@ -35,10 +35,10 @@ public class KeyControlManager implements EventHandler<KeyEvent> {
 		return added;
 	}
 
-	public boolean removeControl(KeyCode code, IControlAction action) {
+	public boolean removeControl(KeyCode code, KeyAction action) {
 		boolean removed = false;
 		if (code != null && action != null) {
-			List<IControlAction> controls = keyControls.get(code);
+			List<KeyAction> controls = keyControls.get(code);
 			// If possible, try to remove the control from the list.
 			if (controls != null) {
 				removed = controls.remove(action);
@@ -54,11 +54,16 @@ public class KeyControlManager implements EventHandler<KeyEvent> {
 	 */
 	@Override
 	public void handle(KeyEvent event) {
-		List<IControlAction> controls = keyControls.get(event.getCode());
+		List<KeyAction> controls = keyControls.get(event.getCode());
 		if (controls != null) {
-			boolean pressed = (event.getEventType() == KeyEvent.KEY_PRESSED);
-			for (IControlAction control : controls) {
-				control.performAction(pressed, -1.0f);
+			if (KeyEvent.KEY_PRESSED == event.getEventType()) {
+				for (KeyAction control : controls) {
+					control.keyPressed(-1.0f, event);
+				}
+			} else {
+				for (KeyAction control : controls) {
+					control.keyReleased(-1.0f, event);
+				}
 			}
 		}
 		// Consume the event so it is not processed again.

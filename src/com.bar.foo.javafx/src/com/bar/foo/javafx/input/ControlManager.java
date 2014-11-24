@@ -46,6 +46,7 @@ public class ControlManager {
 			// Register key event handlers.
 			scene.setOnKeyPressed(keyControls);
 			scene.setOnKeyReleased(keyControls);
+			scene.setOnKeyTyped(keyControls);
 		}
 		return added;
 	}
@@ -67,15 +68,16 @@ public class ControlManager {
 			// Unregister key event handlers.
 			scene.removeEventHandler(KeyEvent.KEY_PRESSED, keyControls);
 			scene.removeEventHandler(KeyEvent.KEY_RELEASED, keyControls);
+			scene.removeEventHandler(KeyEvent.KEY_TYPED, keyControls);
 		}
 		return removed;
 	}
 
-	public boolean addControl(KeyCode code, IControlAction action) {
+	public boolean addControl(KeyCode code, KeyAction action) {
 		return keyControls.addControl(code, action);
 	}
 
-	public boolean removeControl(KeyCode code, IControlAction action) {
+	public boolean removeControl(KeyCode code, KeyAction action) {
 		return keyControls.removeControl(code, action);
 	}
 
