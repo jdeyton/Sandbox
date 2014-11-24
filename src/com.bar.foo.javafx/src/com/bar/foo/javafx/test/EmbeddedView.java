@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import com.bar.foo.javafx.Node;
 import com.bar.foo.javafx.input.ControlManager;
 import com.bar.foo.javafx.input.MouseCode;
+import com.bar.foo.javafx.input.common.KeyAnalogAction;
 import com.bar.foo.javafx.input.common.KeyToggleAction;
 import com.bar.foo.javafx.input.common.MouseAnalogAction;
 import com.bar.foo.javafx.input.common.MouseToggleAction;
@@ -83,7 +84,53 @@ public class EmbeddedView {
 				}
 			});
 		}
+		
+		final float moveRate = 10f;
 
+		// Add listeners to move the camera a little bit.
+		// W is registered as an analog listener. The others are registered as
+		// action listeners.
+		controls.keys.addAnalog(KeyCode.W, new KeyAnalogAction() {
+			@Override
+			public void run(float value, float timePerFrame, KeyEvent event) {
+				camera.setTranslateZ(camera.getTranslateZ() - moveRate);
+			}
+		});
+		controls.keys.addToggle(KeyCode.S, new KeyToggleAction() {
+			@Override
+			public void pressed(float timePerFrame, KeyEvent event) {
+				camera.setTranslateZ(camera.getTranslateZ() + moveRate);
+			}
+
+			@Override
+			public void released(float timePerFrame, KeyEvent event) {
+				
+			}
+		});
+		controls.keys.addToggle(KeyCode.A, new KeyToggleAction() {
+			@Override
+			public void pressed(float timePerFrame, KeyEvent event) {
+				camera.setTranslateX(camera.getTranslateX() - moveRate);
+			}
+
+			@Override
+			public void released(float timePerFrame, KeyEvent event) {
+				
+			}
+		});
+		controls.keys.addToggle(KeyCode.D, new KeyToggleAction() {
+			@Override
+			public void pressed(float timePerFrame, KeyEvent event) {
+				camera.setTranslateX(camera.getTranslateX() + moveRate);
+			}
+
+			@Override
+			public void released(float timePerFrame, KeyEvent event) {
+				
+			}
+		});
+		
+		// Add a listener for the space key.
 		controls.keys.addToggle(KeyCode.SPACE, new KeyToggleAction() {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
@@ -97,6 +144,7 @@ public class EmbeddedView {
 			}
 		});
 		
+		// Add a listener for mouse movement.
 		controls.mouse.addAnalog(MouseCode.MOVE, new MouseAnalogAction() {
 			@Override
 			public void run(float value, float timePerFrame, MouseEvent event) {
@@ -104,6 +152,7 @@ public class EmbeddedView {
 			}
 		});
 		
+		// Add a listener for the first mouse button.
 		controls.mouse.addToggle(MouseCode.BUTTON_PRIMARY, new MouseToggleAction() {
 			@Override
 			public void pressed(float timePerFrame, MouseEvent event) {
