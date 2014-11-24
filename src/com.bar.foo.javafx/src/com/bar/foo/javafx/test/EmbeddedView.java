@@ -22,6 +22,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import com.bar.foo.javafx.Node;
+import com.bar.foo.javafx.input.IControlAction;
+import com.bar.foo.javafx.input.ControlManager;
 
 /**
  * @author Jordan Deyton
@@ -31,17 +33,16 @@ public class EmbeddedView {
 
 	private final Node root;
 	private final Camera camera;
-	private final Color color;
 
 	private FXCanvas canvas;
 	// Scenes must be constructed or modified on the Application thread.
 	private Scene scene;
 
+	private final ControlManager controls = new ControlManager();
+
 	private static final double radius = 100;
 
 	public EmbeddedView(Node parent, Color color) {
-		this.color = color;
-
 		// Set up the root node.
 		root = new Node();
 
@@ -57,7 +58,8 @@ public class EmbeddedView {
 
 		// Set up the view camera.
 		Node cameraNode = new Node();
-//		cameraNode.setRotateX(180.0); // An alternative to rotating the camera.
+		// cameraNode.setRotateX(180.0); // An alternative to rotating the
+		// camera.
 		root.getChildren().add(cameraNode);
 		camera = new PerspectiveCamera(true);
 		camera.setNearClip(0.1);
@@ -66,7 +68,7 @@ public class EmbeddedView {
 		camera.setTranslateX(radius * 2.0); // Move the camera to the right.
 		camera.getTransforms().add(new Rotate(180.0, Rotate.X_AXIS));
 		cameraNode.getChildren().add(camera);
-		
+
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.
 			// Normally, you should check Platform.isFxApplicationThread() first
@@ -78,6 +80,15 @@ public class EmbeddedView {
 				}
 			});
 		}
+
+		controls.addControl(KeyCode.SPACE, new IControlAction() {
+			@Override
+			public void performAction(boolean pressed, float timePerFrame) {
+				System.out.println("SPAAAAAAAAAAACE GHOOOOOOOOOOOOOST");
+				System.out.println(color);
+				System.out.println(pressed);
+			}
+		});
 	}
 
 	public Node getRoot() {
@@ -92,23 +103,16 @@ public class EmbeddedView {
 			scene.setCamera(camera);
 			canvas.setScene(scene);
 			composite = canvas;
-			
-			EventHandler<KeyEvent> onSpace = new EventHandler<KeyEvent>() {
-				@Override
-				public void handle(KeyEvent event) {
-					if (event.getCode() == KeyCode.SPACE) {
-						System.out.println("SPAAAAAAAAAAACE GHOOOOOOOOOOOOOST");
-						System.out.println(color);
-					}
-				}
-			};
-			scene.setOnKeyPressed(onSpace);
+
+			controls.addScene(scene);
 		}
 		return composite;
 	}
 
 	public void dispose() {
 		if (canvas != null) {
+			controls.removeScene(scene);
+
 			if (!canvas.isDisposed()) {
 				canvas.dispose();
 			}
