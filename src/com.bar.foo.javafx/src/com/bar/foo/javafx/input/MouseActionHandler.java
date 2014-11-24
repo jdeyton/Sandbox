@@ -17,7 +17,7 @@ public class MouseActionHandler extends ActionHandler<MouseCode, MouseEvent> {
 	 * @see com.bar.foo.javafx.input.ActionHandler#isPressed(javafx.event.Event)
 	 */
 	@Override
-	protected boolean isPressed(MouseEvent event) {
+	protected boolean isOn(MouseEvent event) {
 		return (MouseEvent.MOUSE_PRESSED == event.getEventType());
 	}
 

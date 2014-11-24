@@ -21,7 +21,7 @@ public class KeyActionHandler extends
 	 * Event)
 	 */
 	@Override
-	protected boolean isPressed(KeyEvent event) {
+	protected boolean isOn(KeyEvent event) {
 		return (KeyEvent.KEY_PRESSED == event.getEventType());
 	}
 
@@ -46,7 +46,7 @@ public class KeyActionHandler extends
 	 */
 	@Override
 	protected float getValue(KeyEvent event) {
-		return (isPressed(event) ? 1f : 0f);
+		return (isOn(event) ? 1f : 0f);
 	}
 
 }

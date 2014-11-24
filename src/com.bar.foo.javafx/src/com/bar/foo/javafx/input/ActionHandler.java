@@ -15,7 +15,8 @@ import javafx.event.EventHandler;
  * @author Jordan Deyton
  *
  */
-public abstract class ActionHandler<K, T extends Event> implements EventHandler<T> {
+public abstract class ActionHandler<K, T extends Event> implements
+		EventHandler<T> {
 
 	private final Map<K, List<AnalogAction<T>>> analogMap;
 	private final Map<K, List<ToggleAction<T>>> toggleMap;
@@ -54,7 +55,7 @@ public abstract class ActionHandler<K, T extends Event> implements EventHandler<
 		}
 		return added;
 	}
-	
+
 	// TODO Add remove methods.
 
 	/*
@@ -69,13 +70,13 @@ public abstract class ActionHandler<K, T extends Event> implements EventHandler<
 
 		List<ToggleAction<T>> toggles = toggleMap.get(key);
 		if (toggles != null) {
-			if (isPressed(event)) {
+			if (isOn(event)) {
 				for (ToggleAction<T> toggle : toggles) {
-					toggle.pressed(timePerFrame, event);
+					toggle.on(timePerFrame, event);
 				}
 			} else {
 				for (ToggleAction<T> toggle : toggles) {
-					toggle.released(timePerFrame, event);
+					toggle.off(timePerFrame, event);
 				}
 			}
 		}
@@ -88,18 +89,19 @@ public abstract class ActionHandler<K, T extends Event> implements EventHandler<
 			}
 		}
 
+		// This event should not be processed any further by the JavaFX engine.
+		event.consume();
+
 		return;
 	}
-
-
 
 	protected float getTimePerFrame() {
 		return 0f;
 	}
 
-	protected abstract boolean isPressed(T event);
+	protected abstract boolean isOn(T event);
 
 	protected abstract K getTrigger(T event);
-	
+
 	protected abstract float getValue(T event);
 }

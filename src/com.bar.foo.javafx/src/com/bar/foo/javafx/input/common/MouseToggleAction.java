@@ -11,6 +11,6 @@ import com.bar.foo.javafx.input.ToggleAction;
  * @author Jordan Deyton
  *
  */
-public interface MouseToggleAction extends ToggleAction<MouseEvent> {
+public abstract class MouseToggleAction extends ToggleAction<MouseEvent> {
 
 }
