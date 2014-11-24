@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -22,7 +23,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.bar.foo.javafx.Node;
 import com.bar.foo.javafx.input.ControlManager;
-import com.bar.foo.javafx.input.KeyAction;
+import com.bar.foo.javafx.input.common.KeyToggleAction;
+import com.bar.foo.javafx.input.common.MouseAnalogAction;
 
 /**
  * @author Jordan Deyton
@@ -80,16 +82,23 @@ public class EmbeddedView {
 			});
 		}
 
-		controls.addControl(KeyCode.SPACE, new KeyAction() {
+		controls.keys.addToggle(KeyCode.SPACE, new KeyToggleAction() {
 			@Override
-			public void keyPressed(float timePerFrame, KeyEvent event) {
+			public void pressed(float timePerFrame, KeyEvent event) {
 				System.out.println("SPAAAAAAAAAAACE GHOOOOOOOOOOOOOST");
 				System.out.println(color);				
 			}
-
+			
 			@Override
-			public void keyReleased(float timePerFrame, KeyEvent event) {
+			public void released(float timePerFrame, KeyEvent event) {
 				System.out.println("Released...");
+			}
+		});
+		
+		controls.mouse.addAnalog(MouseEvent.MOUSE_MOVED, new MouseAnalogAction() {
+			@Override
+			public void run(float value, float timePerFrame, MouseEvent event) {
+				System.out.println("x,y: " + event.getSceneX() + "," + event.getSceneY());
 			}
 		});
 	}

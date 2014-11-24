@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 /**
  * This class manages key and mouse controls for a collection of JavaFX scenes.
@@ -23,10 +23,8 @@ public class ControlManager {
 	 */
 	private final List<Scene> managedScenes = new ArrayList<Scene>();
 
-	private final KeyControlManager keyControls = new KeyControlManager();
-
-	// For now, we only support key pressed and key released events.
-	// TODO Experiment with key typed events. (see add and remove scene methods)
+	public final KeyActionHandler keys = new KeyActionHandler();
+	public final MouseActionHandler mouse = new MouseActionHandler();
 
 	/**
 	 * Adds a {@code Scene} whose controls will be managed by this
@@ -44,9 +42,13 @@ public class ControlManager {
 			added = managedScenes.add(scene);
 
 			// Register key event handlers.
-			scene.setOnKeyPressed(keyControls);
-			scene.setOnKeyReleased(keyControls);
-			scene.setOnKeyTyped(keyControls);
+			scene.addEventHandler(KeyEvent.KEY_PRESSED, keys);
+			scene.addEventHandler(KeyEvent.KEY_RELEASED, keys);
+			
+			// Register mouse event handlers.
+			scene.addEventFilter(MouseEvent.MOUSE_PRESSED, mouse);
+			scene.addEventFilter(MouseEvent.MOUSE_RELEASED, mouse);
+			scene.addEventFilter(MouseEvent.MOUSE_MOVED, mouse);
 		}
 		return added;
 	}
@@ -66,19 +68,12 @@ public class ControlManager {
 		if (scene != null && managedScenes.remove(scene)) {
 
 			// Unregister key event handlers.
-			scene.removeEventHandler(KeyEvent.KEY_PRESSED, keyControls);
-			scene.removeEventHandler(KeyEvent.KEY_RELEASED, keyControls);
-			scene.removeEventHandler(KeyEvent.KEY_TYPED, keyControls);
+			scene.removeEventHandler(KeyEvent.KEY_PRESSED, keys);
+			scene.removeEventHandler(KeyEvent.KEY_RELEASED, keys);
+			
+			// TODO remove things added via addScene...
 		}
 		return removed;
-	}
-
-	public boolean addControl(KeyCode code, KeyAction action) {
-		return keyControls.addControl(code, action);
-	}
-
-	public boolean removeControl(KeyCode code, KeyAction action) {
-		return keyControls.removeControl(code, action);
 	}
 
 }
