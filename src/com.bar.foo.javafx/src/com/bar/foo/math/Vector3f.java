@@ -214,10 +214,13 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f normalize() {
-		float inverseLength = 1f / length();
-		x *= inverseLength;
-		y *= inverseLength;
-		z *= inverseLength;
+		float lengthSquared = lengthSquared();
+		if (lengthSquared != 1f && lengthSquared > 0f) {
+			float inverseLength = 1f / FloatMath.sqrt(lengthSquared);
+			x *= inverseLength;
+			y *= inverseLength;
+			z *= inverseLength;
+		}
 		return this;
 	}
 
@@ -228,14 +231,17 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f normalize(Vector3f cache) {
-		float inverseLength = 1f / length();
-		if (cache != null) {
-			cache.x = x * inverseLength;
-			cache.y = y * inverseLength;
-			cache.z = z * inverseLength;
-		} else {
-			cache = new Vector3f(x * inverseLength, y * inverseLength, z
-					* inverseLength);
+		float lengthSquared = lengthSquared();
+		if (lengthSquared != 1f && lengthSquared > 0f) {
+			float inverseLength = 1f / FloatMath.sqrt(lengthSquared);
+			if (cache != null) {
+				cache.x = x * inverseLength;
+				cache.y = y * inverseLength;
+				cache.z = z * inverseLength;
+			} else {
+				cache = new Vector3f(x * inverseLength, y * inverseLength, z
+						* inverseLength);
+			}
 		}
 		return cache;
 	}

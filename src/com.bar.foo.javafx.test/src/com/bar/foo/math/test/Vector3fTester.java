@@ -11,6 +11,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import com.bar.foo.math.FloatMath;
 import com.bar.foo.math.Vector3f;
 
 /**
@@ -219,6 +220,11 @@ public class Vector3fTester {
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
 
+		// Get the expected values.
+		final float negatedX = -x;
+		final float negatedY = -y;
+		final float negatedZ = -z;
+
 		// Calling negate initially shouldn't make a difference. Check the
 		// return value.
 		assertSame(vector, vector.negate());
@@ -230,39 +236,40 @@ public class Vector3fTester {
 		assertEquals(0f, cache.x, delta);
 		assertEquals(0f, cache.y, delta);
 		assertEquals(0f, cache.z, delta);
-		
+
 		// Calling negate should change the local values.
-		vector.set(x, y, z);
+		vector.set(x, y, z); // Reset the vector.
 		assertSame(vector, vector.negate());
-		assertEquals(-x, vector.x, delta);
-		assertEquals(-y, vector.y, delta);
-		assertEquals(-z, vector.z, delta);
+		assertEquals(negatedX, vector.x, delta);
+		assertEquals(negatedY, vector.y, delta);
+		assertEquals(negatedZ, vector.z, delta);
 		// Same check with the cache value, but the original vector is same.
+		vector.set(x, y, z); // Reset the vector.
 		assertSame(cache, vector.negate(cache));
-		assertEquals(-x, vector.x, delta);
-		assertEquals(-y, vector.y, delta);
-		assertEquals(-z, vector.z, delta);
-		assertEquals(x, cache.x, delta);
-		assertEquals(y, cache.y, delta);
-		assertEquals(z, cache.z, delta);
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		assertEquals(negatedX, cache.x, delta);
+		assertEquals(negatedY, cache.y, delta);
+		assertEquals(negatedZ, cache.z, delta);
 		// Same check with a null cache. A null value should cause a new vector
-		// to be created. The original vector is still negative because of the 
-		// cache call!
+		// to be created.
+		vector.set(x, y, z); // Reset the vector.
 		newCache = vector.negate(newCache);
 		assertNotSame(vector, newCache);
 		assertNotSame(cache, newCache);
-		assertEquals(-x, vector.x, delta);
-		assertEquals(-y, vector.y, delta);
-		assertEquals(-z, vector.z, delta);
-		assertEquals(x, newCache.x, delta);
-		assertEquals(y, newCache.y, delta);
-		assertEquals(z, newCache.z, delta);
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		assertEquals(negatedX, newCache.x, delta);
+		assertEquals(negatedY, newCache.y, delta);
+		assertEquals(negatedZ, newCache.z, delta);
 
 		return;
 	}
 
 	/**
-	 * TODO
+	 * Checks the normalize operations provided by {@code Vector3f}.
 	 */
 	@Test
 	public void checkNormalize() {
@@ -273,14 +280,60 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
 
-		fail("Not implemented.");
+		// Get the expected values.
+		float length = FloatMath.sqrt(x * x + y * y + z * z);
+		final float normalizedX = x / length;
+		final float normalizedY = y / length;
+		final float normalizedZ = z / length;
+
+		// Calling negate initially shouldn't make a difference. Check the
+		// return value.
+		assertSame(vector, vector.negate());
+		assertEquals(0f, vector.x, delta);
+		assertEquals(0f, vector.y, delta);
+		assertEquals(0f, vector.z, delta);
+		// Same check with the cache value.
+		assertSame(cache, vector.negate(cache));
+		assertEquals(0f, cache.x, delta);
+		assertEquals(0f, cache.y, delta);
+		assertEquals(0f, cache.z, delta);
+
+		// Calling negate should change the local values.
+		vector.set(x, y, z); // Reset the vector.
+		assertSame(vector, vector.normalize());
+		assertEquals(normalizedX, vector.x, delta);
+		assertEquals(normalizedY, vector.y, delta);
+		assertEquals(normalizedZ, vector.z, delta);
+		// Same check with the cache value, but the original vector is same.
+		vector.set(x, y, z); // Reset the vector.
+		assertSame(cache, vector.normalize(cache));
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		assertEquals(normalizedX, cache.x, delta);
+		assertEquals(normalizedY, cache.y, delta);
+		assertEquals(normalizedZ, cache.z, delta);
+		// Same check with a null cache. A null value should cause a new vector
+		// to be created.
+		vector.set(x, y, z); // Reset the vector.
+		newCache = vector.normalize(newCache);
+		assertNotSame(vector, newCache);
+		assertNotSame(cache, newCache);
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		assertEquals(normalizedX, newCache.x, delta);
+		assertEquals(normalizedY, newCache.y, delta);
+		assertEquals(normalizedZ, newCache.z, delta);
 
 		return;
 	}
 
 	/**
-	 * TODO
+	 * Checks the computations of the vector length.
 	 */
 	@Test
 	public void checkLength() {
@@ -291,8 +344,27 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
 
-		fail("Not implemented.");
+		// Get the expected values.
+		final float lengthSquared = x * x + y * y + z * z;
+		final float length = FloatMath.sqrt(lengthSquared);
+
+		// Check the default value.
+		assertSame(vector, vector.negate());
+		assertEquals(0f, vector.lengthSquared(), delta);
+		assertEquals(0f, vector.length(), delta);
+
+		// Check the computed value with the specified coordinates.
+		vector.set(x, y, z);
+		assertEquals(lengthSquared, vector.lengthSquared(), delta);
+		assertEquals(length, vector.length(), delta);
+
+		// Normalize it and try taking the length again.
+		vector.normalize();
+		assertEquals(1f, vector.lengthSquared(), delta);
+		assertEquals(1f, vector.length(), delta);
 
 		return;
 	}
