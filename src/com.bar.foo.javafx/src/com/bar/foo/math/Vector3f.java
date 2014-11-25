@@ -25,6 +25,52 @@ public class Vector3f implements IVector3f {
 	public float z;
 
 	/**
+	 * The zero-vector.
+	 * <p>
+	 * <b>DO NOT MANIPULATE THIS VECTOR!</b> Instead, use a <b><i>copy</i></b>
+	 * of it by calling the copy constructor, e.g.,
+	 * {@code new Vector3f(Vector3f.ZERO)}.
+	 * </p>
+	 */
+	public static final Vector3f ZERO = new Vector3f();
+	/**
+	 * The unit-x vector.
+	 * <p>
+	 * <b>DO NOT MANIPULATE THIS VECTOR!</b> Instead, use a <b><i>copy</i></b>
+	 * of it by calling the copy constructor, e.g.,
+	 * {@code new Vector3f(Vector3f.UNIT_X)} .
+	 * </p>
+	 */
+	public static final Vector3f UNIT_X = new Vector3f(1f, 0f, 0f);
+	/**
+	 * The unit-y vector.
+	 * <p>
+	 * <b>DO NOT MANIPULATE THIS VECTOR!</b> Instead, use a <b><i>copy</i></b>
+	 * of it by calling the copy constructor, e.g.,
+	 * {@code new Vector3f(Vector3f.UNIT_Y)} .
+	 * </p>
+	 */
+	public static final Vector3f UNIT_Y = new Vector3f(0f, 1f, 0f);
+	/**
+	 * The unit-z vector.
+	 * <p>
+	 * <b>DO NOT MANIPULATE THIS VECTOR!</b> Instead, use a <b><i>copy</i></b>
+	 * of it by calling the copy constructor, e.g.,
+	 * {@code new Vector3f(Vector3f.UNIT_Z)} .
+	 * </p>
+	 */
+	public static final Vector3f UNIT_Z = new Vector3f(0f, 0f, 1f);
+	/**
+	 * The identity vector. It does NOT have unit length!
+	 * <p>
+	 * <b>DO NOT MANIPULATE THIS VECTOR!</b> Instead, use a <b><i>copy</i></b>
+	 * of it by calling the copy constructor, e.g.,
+	 * {@code new Vector3f(Vector3f.IDENTITY)}.
+	 * </p>
+	 */
+	public static final Vector3f IDENTITY = new Vector3f(1f, 1f, 1f);
+
+	/**
 	 * The default constructor. Creates a zero vector.
 	 */
 	public Vector3f() {
@@ -71,8 +117,7 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public float length() {
-		// TODO Auto-generated method stub
-		return 0;
+		return FloatMath.sqrt(lengthSquared());
 	}
 
 	/*
@@ -82,8 +127,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public float lengthSquared() {
-		// TODO Auto-generated method stub
-		return 0;
+		double x2 = x * x;
+		double y2 = y * y;
+		double z2 = z * z;
+		return (float) (x2 + y2 + z2);
 	}
 
 	/*
@@ -93,8 +140,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f set(float x, float y, float z) {
-		// TODO Auto-generated method stub
-		return null;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		return this;
 	}
 
 	/*
@@ -104,8 +153,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f set(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return null;
+		x = vector.x;
+		y = vector.y;
+		z = vector.z;
+		return this;
 	}
 
 	/*
@@ -115,8 +166,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f negate() {
-		// TODO Auto-generated method stub
-		return null;
+		x = -x;
+		y = -y;
+		z = -z;
+		return this;
 	}
 
 	/*
@@ -126,8 +179,14 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f negate(Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = -x;
+			store.y = -y;
+			store.z = -z;
+		} else {
+			store = new Vector3f(-x, -y, -z);
+		}
+		return store;
 	}
 
 	/*
@@ -137,8 +196,11 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f normalize() {
-		// TODO Auto-generated method stub
-		return null;
+		float inverseLength = 1f / length();
+		x *= inverseLength;
+		y *= inverseLength;
+		z *= inverseLength;
+		return this;
 	}
 
 	/*
@@ -148,8 +210,16 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f normalize(Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		float inverseLength = 1f / length();
+		if (store != null) {
+			store.x = x * inverseLength;
+			store.y = y * inverseLength;
+			store.z = z * inverseLength;
+		} else {
+			store = new Vector3f(x * inverseLength, y * inverseLength, z
+					* inverseLength);
+		}
+		return store;
 	}
 
 	/*
@@ -159,8 +229,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f add(float x, float y, float z) {
-		// TODO Auto-generated method stub
-		return null;
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
 	}
 
 	/*
@@ -170,8 +242,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f add(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return null;
+		x += vector.x;
+		y += vector.y;
+		z += vector.z;
+		return this;
 	}
 
 	/*
@@ -182,8 +256,14 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f add(float x, float y, float z, Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = this.x + x;
+			store.y = this.y + y;
+			store.z = this.z + z;
+		} else {
+			store = new Vector3f(this.x + x, this.y + y, this.z + z);
+		}
+		return store;
 	}
 
 	/*
@@ -194,8 +274,14 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f add(Vector3f vector, Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = x + vector.x;
+			store.y = y + vector.y;
+			store.z = z + vector.z;
+		} else {
+			store = new Vector3f(x + vector.x, y + vector.y, z + vector.z);
+		}
+		return store;
 	}
 
 	/*
@@ -205,8 +291,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f subtract(float x, float y, float z) {
-		// TODO Auto-generated method stub
-		return null;
+		this.x -= x;
+		this.y -= y;
+		this.z -= z;
+		return this;
 	}
 
 	/*
@@ -216,8 +304,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f subtract(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return null;
+		x -= vector.x;
+		y -= vector.y;
+		z -= vector.z;
+		return this;
 	}
 
 	/*
@@ -228,8 +318,14 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f subtract(float x, float y, float z, Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = this.x - x;
+			store.y = this.y - y;
+			store.z = this.z - z;
+		} else {
+			store = new Vector3f(this.x - x, this.y - y, this.z - z);
+		}
+		return store;
 	}
 
 	/*
@@ -240,8 +336,14 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f subtract(Vector3f vector, Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = x - vector.x;
+			store.y = y - vector.y;
+			store.z = z - vector.z;
+		} else {
+			store = new Vector3f(x - vector.x, y - vector.y, z - vector.z);
+		}
+		return store;
 	}
 
 	/*
@@ -251,8 +353,23 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f multiply(float scalar) {
-		// TODO Auto-generated method stub
-		return null;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.bar.foo.math.IVector3f#multiply(float, float, float)
+	 */
+	@Override
+	public Vector3f multiply(float xScale, float yScale, float zScale) {
+		x *= xScale;
+		y *= yScale;
+		z *= zScale;
+		return this;
 	}
 
 	/*
@@ -263,8 +380,33 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f multiply(float scalar, Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = x * scalar;
+			store.y = y * scalar;
+			store.z = z * scalar;
+		} else {
+			store = new Vector3f(x * scalar, y * scalar, z * scalar);
+		}
+		return store;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.bar.foo.math.IVector3f#multiply(float, float, float
+	 * com.bar.foo.math.Vector3f)
+	 */
+	@Override
+	public Vector3f multiply(float xScale, float yScale, float zScale,
+			Vector3f store) {
+		if (store != null) {
+			store.x = x * xScale;
+			store.y = y * yScale;
+			store.z = z * zScale;
+		} else {
+			store = new Vector3f(x * xScale, y * yScale, z * zScale);
+		}
+		return store;
 	}
 
 	/*
@@ -274,8 +416,7 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public float dot(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return 0;
+		return x * vector.x + y * vector.y + z * vector.z;
 	}
 
 	/*
@@ -285,8 +426,8 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f cross(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return null;
+		return new Vector3f(y * vector.z - z * vector.y, z * vector.x - x
+				* vector.z, x * vector.y - y * vector.x);
 	}
 
 	/*
@@ -297,8 +438,14 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f cross(Vector3f vector, Vector3f store) {
-		// TODO Auto-generated method stub
-		return null;
+		if (store != null) {
+			store.x = y * vector.z - z * vector.y;
+			store.y = z * vector.x - x * vector.z;
+			store.z = x * vector.y - y * vector.x;
+		} else {
+			store = cross(vector);
+		}
+		return store;
 	}
 
 	/*
@@ -308,8 +455,12 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f crossLocal(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return null;
+		float x = y * vector.z - z * vector.y;
+		float y = z * vector.x - x * vector.z;
+		z = x * vector.y - y * vector.x;
+		this.x = x;
+		this.y = y;
+		return this;
 	}
 
 	/*
@@ -319,8 +470,7 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public float distance(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return 0;
+		return FloatMath.sqrt(distanceSquared(vector));
 	}
 
 	/*
@@ -331,10 +481,10 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public float distanceSquared(Vector3f vector) {
-		// TODO Auto-generated method stub
-		return 0;
+		double distX = x - vector.x;
+		double distY = y - vector.y;
+		double distZ = z - vector.z;
+		return (float) (distX * distX + distY * distY + distZ * distZ);
 	}
-
-	// TODO Add unit vectors.
 
 }

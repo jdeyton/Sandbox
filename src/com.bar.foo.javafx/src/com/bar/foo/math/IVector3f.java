@@ -205,6 +205,23 @@ public interface IVector3f {
 	public Vector3f multiply(float scalar);
 
 	/**
+	 * Multiplies or scales this vector by the scalar arguments. Each axis can
+	 * be scaled uniquely.
+	 * 
+	 * @param xScale
+	 *            The scalar value by which this vector's x coordinate is
+	 *            multiplied.
+	 * @param yScale
+	 *            The scalar value by which this vector's y coordinate is
+	 *            multiplied.
+	 * @param zScale
+	 *            The scalar value by which this vector's z coordinate is
+	 *            multiplied.
+	 * @return A reference to this vector.
+	 */
+	public Vector3f multiply(float xScale, float yScale, float zScale);
+
+	/**
 	 * Multiplies or scales this vector by the scalar argument, but stores the
 	 * resulting values in the specified <i>store</i> vector.
 	 * 
@@ -216,6 +233,27 @@ public interface IVector3f {
 	 * @return The <i>store</i> vector.
 	 */
 	public Vector3f multiply(float scalar, Vector3f store);
+
+	/**
+	 * Multiplies or scales this vector by the scalar arguments, but stores the
+	 * resulting values in the specified <i>store</i> vector. Each axis can be
+	 * scaled uniquely.
+	 * 
+	 * @param xScale
+	 *            The scalar value by which this vector's x coordinate is
+	 *            multiplied.
+	 * @param yScale
+	 *            The scalar value by which this vector's y coordinate is
+	 *            multiplied.
+	 * @param zScale
+	 *            The scalar value by which this vector's z coordinate is
+	 *            multiplied.
+	 * @param store
+	 *            The vector in which to store the computed values.
+	 * @return The <i>store</i> vector.
+	 */
+	public Vector3f multiply(float xScale, float yScale, float zScale,
+			Vector3f store);
 
 	/**
 	 * Computes the dot product between this vector and the supplied vector.
