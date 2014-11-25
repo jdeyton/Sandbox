@@ -485,6 +485,14 @@ public class Vector3fTester {
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
+		try {
+			vector2 = null;
+			vector.add(vector2, newCache);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
 		// -------------------------------------------- //
 
 		return;
