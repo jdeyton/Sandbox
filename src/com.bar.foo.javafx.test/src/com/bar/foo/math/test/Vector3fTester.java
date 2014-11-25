@@ -25,7 +25,7 @@ public class Vector3fTester {
 	/**
 	 * The delta value to be used in all float/double comparisons.
 	 */
-	private static final double delta = 1e-7;
+	private static final double delta = 1e-5;
 
 	/**
 	 * A prefix used when failing with a custom message.
@@ -219,6 +219,7 @@ public class Vector3fTester {
 		Vector3f vector = new Vector3f();
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
+		final Vector3f nullVector = null;
 
 		// Get the expected values.
 		final float negatedX = -x;
@@ -255,7 +256,9 @@ public class Vector3fTester {
 		// Same check with a null cache. A null value should cause a new vector
 		// to be created.
 		vector.set(x, y, z); // Reset the vector.
-		newCache = vector.negate(newCache);
+		// Clear the cache so it is not unintentionally used again in this.
+		cache.set(1f, 2f, 3f);
+		newCache = vector.negate(nullVector);
 		assertNotSame(vector, newCache);
 		assertNotSame(cache, newCache);
 		assertEquals(x, vector.x, delta);
@@ -282,6 +285,7 @@ public class Vector3fTester {
 		Vector3f vector = new Vector3f();
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
+		final Vector3f nullVector = null;
 
 		// Get the expected values.
 		float length = FloatMath.sqrt(x * x + y * y + z * z);
@@ -319,7 +323,9 @@ public class Vector3fTester {
 		// Same check with a null cache. A null value should cause a new vector
 		// to be created.
 		vector.set(x, y, z); // Reset the vector.
-		newCache = vector.normalize(newCache);
+		// Clear the cache so it is not unintentionally used again in this.
+		cache.set(1f, 2f, 3f);
+		newCache = vector.normalize(nullVector);
 		assertNotSame(vector, newCache);
 		assertNotSame(cache, newCache);
 		assertEquals(x, vector.x, delta);
@@ -363,7 +369,7 @@ public class Vector3fTester {
 		vector.normalize();
 		assertEquals(1f, vector.lengthSquared(), delta);
 		assertEquals(1f, vector.length(), delta);
-
+		
 		return;
 	}
 
@@ -387,6 +393,7 @@ public class Vector3fTester {
 		Vector3f vector = new Vector3f();
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
+		final Vector3f nullVector = null;
 
 		// Generate values to add.
 		float x2 = random.nextFloat();
@@ -441,13 +448,16 @@ public class Vector3fTester {
 		// ----------------------------------------------- //
 
 		// ---- Check that the two cache-based ops handle null cache. ---- //
+		// Clear the cache so it is not unintentionally used again in this.
+		cache.set(1f, 2f, 3f);
+
 		// Reset the vector to the x, y, and z values.
 		vector.set(x, y, z);
 
 		// Add x2, y, z2 to the vector using the float form.
 		newCache = null;
 		// Make sure the return value is a new vector.
-		vector.add(x2, y2, z2, newCache);
+		newCache = vector.add(x2, y2, z2, nullVector);
 		assertNotSame(newCache, vector);
 		assertNotSame(newCache, cache);
 		// The values of the original vector should not change.
@@ -455,14 +465,13 @@ public class Vector3fTester {
 		assertEquals(y, vector.y, delta);
 		assertEquals(z, vector.z, delta);
 		// The values in the cache should be the expected values.
-		assertEquals(addedX, cache.x, delta);
-		assertEquals(addedY, cache.y, delta);
-		assertEquals(addedZ, cache.z, delta);
+		assertEquals(addedX, newCache.x, delta);
+		assertEquals(addedY, newCache.y, delta);
+		assertEquals(addedZ, newCache.z, delta);
 
 		// Add x2, y, z2 to the vector using the vector form.
-		newCache = null;
 		// Make sure the return value is a new vector.
-		vector.add(x2, y2, z2, newCache);
+		newCache = vector.add(x2, y2, z2, nullVector);
 		assertNotSame(newCache, vector);
 		assertNotSame(newCache, cache);
 		// The values of the original vector should not change.
@@ -470,24 +479,22 @@ public class Vector3fTester {
 		assertEquals(y, vector.y, delta);
 		assertEquals(z, vector.z, delta);
 		// The values in the cache should be the expected values.
-		assertEquals(addedX, cache.x, delta);
-		assertEquals(addedY, cache.y, delta);
-		assertEquals(addedZ, cache.z, delta);
+		assertEquals(addedX, newCache.x, delta);
+		assertEquals(addedY, newCache.y, delta);
+		assertEquals(addedZ, newCache.z, delta);
 		// --------------------------------------------------------------- //
 
 		// ---- Check for null pointer exceptions. ---- //
 		// These should only happen when a non-cache vector is passed.
 		try {
-			vector2 = null;
-			vector.add(vector2);
+			vector.add(nullVector);
 			fail(failurePrefix
 					+ "Operation supports null vector argument for vector that is not used as a cache!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		try {
-			vector2 = null;
-			vector.add(vector2, newCache);
+			vector.add(nullVector, newCache);
 			fail(failurePrefix
 					+ "Operation supports null vector argument for vector that is not used as a cache!");
 		} catch (NullPointerException e) {
@@ -518,6 +525,7 @@ public class Vector3fTester {
 		Vector3f vector = new Vector3f();
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
+		Vector3f nullVector = null;
 
 		// Generate values to add.
 		float x2 = random.nextFloat();
@@ -580,13 +588,15 @@ public class Vector3fTester {
 		// ----------------------------------------------- //
 
 		// ---- Check that the two cache-based ops handle null cache. ---- //
+		// Clear the cache so it is not unintentionally used again in this.
+		cache.set(1f, 2f, 3f);
+
 		// Reset the vector to the x, y, and z values.
 		vector.set(x, y, z);
 
 		// Add x2, y, z2 to the vector using the float form.
-		newCache = null;
 		// Make sure the return value is a new vector.
-		vector.add(x2, y2, z2, newCache);
+		newCache = vector.subtract(x2, y2, z2, nullVector);
 		assertNotSame(newCache, vector);
 		assertNotSame(newCache, cache);
 		// The values of the original vector should not change.
@@ -594,14 +604,13 @@ public class Vector3fTester {
 		assertEquals(y, vector.y, delta);
 		assertEquals(z, vector.z, delta);
 		// The values in the cache should be the expected values.
-		assertEquals(subtractedX, cache.x, delta);
-		assertEquals(subtractedY, cache.y, delta);
-		assertEquals(subtractedZ, cache.z, delta);
+		assertEquals(subtractedX, newCache.x, delta);
+		assertEquals(subtractedY, newCache.y, delta);
+		assertEquals(subtractedZ, newCache.z, delta);
 
 		// Add x2, y, z2 to the vector using the vector form.
-		newCache = null;
 		// Make sure the return value is a new vector.
-		vector.add(x2, y2, z2, newCache);
+		cache = vector.subtract(x2, y2, z2, nullVector);
 		assertNotSame(newCache, vector);
 		assertNotSame(newCache, cache);
 		// The values of the original vector should not change.
@@ -609,24 +618,22 @@ public class Vector3fTester {
 		assertEquals(y, vector.y, delta);
 		assertEquals(z, vector.z, delta);
 		// The values in the cache should be the expected values.
-		assertEquals(subtractedX, cache.x, delta);
-		assertEquals(subtractedY, cache.y, delta);
-		assertEquals(subtractedZ, cache.z, delta);
+		assertEquals(subtractedX, newCache.x, delta);
+		assertEquals(subtractedY, newCache.y, delta);
+		assertEquals(subtractedZ, newCache.z, delta);
 		// --------------------------------------------------------------- //
 
 		// ---- Check for null pointer exceptions. ---- //
 		// These should only happen when a non-cache vector is passed.
 		try {
-			vector2 = null;
-			vector.subtract(vector2);
+			vector.subtract(nullVector);
 			fail(failurePrefix
 					+ "Operation supports null vector argument for vector that is not used as a cache!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		try {
-			vector2 = null;
-			vector.subtract(vector2, newCache);
+			vector.subtract(nullVector, newCache);
 			fail(failurePrefix
 					+ "Operation supports null vector argument for vector that is not used as a cache!");
 		} catch (NullPointerException e) {
@@ -638,7 +645,13 @@ public class Vector3fTester {
 	}
 
 	/**
-	 * TODO
+	 * Checks that the multiplication operations provided by {@code Vector3f}
+	 * are calculated correctly.
+	 * 
+	 * @see Vector3f#multiply(float)
+	 * @see Vector3f#multiply(float, float, float)
+	 * @see Vector3f#multiply(float, Vector3f)
+	 * @see Vector3f#multiply(float, float, float, Vector3f)
 	 */
 	@Test
 	public void checkMultiplication() {
@@ -651,8 +664,103 @@ public class Vector3fTester {
 		Vector3f vector = new Vector3f();
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
+		Vector3f nullVector = null;
 
-		fail("Not implemented.");
+		// Generate values to add.
+		float scalar = random.nextFloat();
+		float x2 = random.nextFloat();
+		float y2 = random.nextFloat();
+		float z2 = random.nextFloat();
+
+		// ---- Check the two non-cache (local) operations. ---- //
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Multiply the vector by the scalar value.
+		assertSame(vector, vector.multiply(scalar)); // Returned: vector
+		assertEquals(x * scalar, vector.x, delta);
+		assertEquals(y * scalar, vector.y, delta);
+		assertEquals(z * scalar, vector.z, delta);
+
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y2, z2 to the vector using the vector form of the operation.
+		assertSame(vector, vector.multiply(x2, y2, z2)); // Returned: vector
+		assertEquals(x * x2, vector.x, delta);
+		assertEquals(y * y2, vector.y, delta);
+		assertEquals(z * z2, vector.z, delta);
+		// ----------------------------------------------------- //
+
+		// ---- Check the two cache-based operations. ---- //
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y, z2 to the vector using the float form.
+		assertSame(cache, vector.multiply(scalar, cache)); // Returned: cache
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(x * scalar, cache.x, delta);
+		assertEquals(y * scalar, cache.y, delta);
+		assertEquals(z * scalar, cache.z, delta);
+
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y, z2 to the vector using the vector form.
+		assertSame(cache, vector.multiply(x2, y2, z2, cache)); // Returned:
+																// cache
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(x * x2, cache.x, delta);
+		assertEquals(y * y2, cache.y, delta);
+		assertEquals(z * z2, cache.z, delta);
+		// ----------------------------------------------- //
+
+		// ---- Check that the two cache-based ops handle null cache. ---- //
+		// Clear the cache so it is not unintentionally used again in this.
+		cache.set(1f, 2f, 3f);
+		
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y, z2 to the vector using the float form.
+		// Make sure the return value is a new vector.
+		newCache = vector.multiply(scalar, nullVector);
+		assertNotSame(newCache, vector);
+		assertNotSame(newCache, cache);
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(x * scalar, newCache.x, delta);
+		assertEquals(y * scalar, newCache.y, delta);
+		assertEquals(z * scalar, newCache.z, delta);
+
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y, z2 to the vector using the vector form.
+		// Make sure the return value is a new vector.
+		newCache = vector.multiply(x2, y2, z2, nullVector);
+		assertNotSame(newCache, vector);
+		assertNotSame(newCache, cache);
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(x * x2, newCache.x, delta);
+		assertEquals(y * y2, newCache.y, delta);
+		assertEquals(z * z2, newCache.z, delta);
+		// --------------------------------------------------------------- //
 
 		return;
 	}
