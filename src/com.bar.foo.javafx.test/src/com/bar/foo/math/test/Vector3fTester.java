@@ -2,6 +2,8 @@ package com.bar.foo.math.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -11,6 +13,12 @@ import org.junit.Test;
 
 import com.bar.foo.math.Vector3f;
 
+/**
+ * This class checks all methods and attributes provided by {@link Vector3f}.
+ * 
+ * @author Jordan
+ *
+ */
 public class Vector3fTester {
 
 	/**
@@ -66,6 +74,12 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkConstructors() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
 		Vector3f vector;
 		Vector3f copy;
 
@@ -76,17 +90,17 @@ public class Vector3fTester {
 		assertEquals(0f, vector.z, delta);
 
 		// Test the constructor where coordinates are specified.
-		vector = new Vector3f(1f, 2f, 3f);
-		assertEquals(1f, vector.x, delta);
-		assertEquals(2f, vector.y, delta);
-		assertEquals(3f, vector.z, delta);
+		vector = new Vector3f(x, y, z);
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
 
 		// Test the copy constructor with valid arguments. Coordinates should be
 		// copied.
 		copy = new Vector3f(vector);
-		assertEquals(1f, copy.x, delta);
-		assertEquals(2f, copy.y, delta);
-		assertEquals(3f, copy.z, delta);
+		assertEquals(x, copy.x, delta);
+		assertEquals(y, copy.y, delta);
+		assertEquals(z, copy.z, delta);
 
 		// Test the copy constructor with a null argument. Coordinates should be
 		// set to 0. No exception should occur.
@@ -105,6 +119,8 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkEquality() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
 		float x = random.nextFloat();
 		float y = random.nextFloat();
 		float z = random.nextFloat();
@@ -146,19 +162,103 @@ public class Vector3fTester {
 	}
 
 	/**
-	 * TODO
+	 * Checks the bulk set operations provided by {@code Vector3f}.
 	 */
 	@Test
 	public void checkSet() {
-		fail("Not implemented.");
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+		Vector3f otherVector;
+
+		// Try the basic bulk set method. Also check the return value.
+		assertSame(vector, vector.set(x, y, z));
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+
+		// Try the vector set method. Also check the return value.
+		x = random.nextFloat();
+		y = random.nextFloat();
+		z = random.nextFloat();
+		otherVector = new Vector3f(x, y, z);
+		assertSame(vector, vector.set(otherVector));
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+
+		// Trying to set with a null vector should throw an exception.
+		try {
+			otherVector = null;
+			vector.set(otherVector);
+			fail(failurePrefix
+					+ " Calling set(null) should throw an exception.");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+
+		return;
 	}
 
 	/**
-	 * TODO
+	 * Checks the negate operations provided by {@code Vector3f}.
 	 */
 	@Test
 	public void checkNegate() {
-		fail("Not implemented.");
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
+
+		// Calling negate initially shouldn't make a difference. Check the
+		// return value.
+		assertSame(vector, vector.negate());
+		assertEquals(0f, vector.x, delta);
+		assertEquals(0f, vector.y, delta);
+		assertEquals(0f, vector.z, delta);
+		// Same check with the cache value.
+		assertSame(cache, vector.negate(cache));
+		assertEquals(0f, cache.x, delta);
+		assertEquals(0f, cache.y, delta);
+		assertEquals(0f, cache.z, delta);
+		
+		// Calling negate should change the local values.
+		vector.set(x, y, z);
+		assertSame(vector, vector.negate());
+		assertEquals(-x, vector.x, delta);
+		assertEquals(-y, vector.y, delta);
+		assertEquals(-z, vector.z, delta);
+		// Same check with the cache value, but the original vector is same.
+		assertSame(cache, vector.negate(cache));
+		assertEquals(-x, vector.x, delta);
+		assertEquals(-y, vector.y, delta);
+		assertEquals(-z, vector.z, delta);
+		assertEquals(x, cache.x, delta);
+		assertEquals(y, cache.y, delta);
+		assertEquals(z, cache.z, delta);
+		// Same check with a null cache. A null value should cause a new vector
+		// to be created. The original vector is still negative because of the 
+		// cache call!
+		newCache = vector.negate(newCache);
+		assertNotSame(vector, newCache);
+		assertNotSame(cache, newCache);
+		assertEquals(-x, vector.x, delta);
+		assertEquals(-y, vector.y, delta);
+		assertEquals(-z, vector.z, delta);
+		assertEquals(x, newCache.x, delta);
+		assertEquals(y, newCache.y, delta);
+		assertEquals(z, newCache.z, delta);
+
+		return;
 	}
 
 	/**
@@ -166,7 +266,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkNormalize() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
+
+		return;
 	}
 
 	/**
@@ -174,8 +284,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkLength() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 
 	/**
@@ -183,8 +302,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkAddition() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 
 	/**
@@ -192,8 +320,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkSubtraction() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 
 	/**
@@ -201,8 +338,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkMultiplication() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 
 	/**
@@ -210,8 +356,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkDistance() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 
 	/**
@@ -219,8 +374,17 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkDotProduct() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 
 	/**
@@ -228,7 +392,16 @@ public class Vector3fTester {
 	 */
 	@Test
 	public void checkCrossProduct() {
+		// Generate some random coordinates. Since float is a primitive type, we
+		// don't have to worry about pass-by-reference affecting test results.
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f vector = new Vector3f();
+
 		fail("Not implemented.");
 
+		return;
 	}
 }

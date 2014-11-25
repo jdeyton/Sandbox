@@ -9,9 +9,6 @@ package com.bar.foo.math;
  */
 public interface IVector3f {
 
-	// nullary constructor
-	// set constructor
-	// copy constructor
 	/**
 	 * Computes the length of the vector.
 	 * 
@@ -57,13 +54,13 @@ public interface IVector3f {
 
 	/**
 	 * Negates the x, y, and z values of this vector, but stores the resulting
-	 * values in the specified <i>store</i> vector.
+	 * values in the specified <i>cache</i> vector.
 	 * 
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f negate(Vector3f store);
+	public Vector3f negate(Vector3f cache);
 
 	/**
 	 * Normalizes the vector's values. After this operation, the vector will be
@@ -76,14 +73,14 @@ public interface IVector3f {
 	/**
 	 * 
 	 * Normalizes the vector's values, but stores the resulting values in the
-	 * specified <i>store</i> vector. After this operation, the <i>store</i>
+	 * specified <i>cache</i> vector. After this operation, the <i>cache</i>
 	 * vector will be a <i>unit</i> vector (i.e., its length is 1).
 	 * 
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f normalize(Vector3f store);
+	public Vector3f normalize(Vector3f cache);
 
 	/**
 	 * Adds the specified x, y, and z values to this vector's coordinates.
@@ -110,7 +107,7 @@ public interface IVector3f {
 
 	/**
 	 * Adds the specified x, y, and z values to this vector's coordinates, but
-	 * stores the resulting values in the specified <i>store</i> vector.
+	 * stores the resulting values in the specified <i>cache</i> vector.
 	 * 
 	 * @param x
 	 *            The value added to the vector's x coordinate.
@@ -118,24 +115,24 @@ public interface IVector3f {
 	 *            The value added to the vector's y coordinate.
 	 * @param z
 	 *            The value added to the vector's z coordinate.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f add(float x, float y, float z, Vector3f store);
+	public Vector3f add(float x, float y, float z, Vector3f cache);
 
 	/**
 	 * Adds the specified vector's coordinates to this vector's coordinates, but
-	 * stores the resulting values in the specified <i>store</i> vector.
+	 * stores the resulting values in the specified <i>cache</i> vector.
 	 * 
 	 * @param vector
 	 *            The vector whose x, y, and z values will be added to this
 	 *            vector's coordinates.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f add(Vector3f vector, Vector3f store);
+	public Vector3f add(Vector3f vector, Vector3f cache);
 
 	/**
 	 * Subtracts the specified x, y, and z values from this vector's
@@ -165,7 +162,7 @@ public interface IVector3f {
 	/**
 	 * Subtracts the specified x, y, and z values from this vector's
 	 * coordinates, but stores the resulting values in the specified
-	 * <i>store</i> vector.
+	 * <i>cache</i> vector.
 	 * 
 	 * @param x
 	 *            The value subtracted from the vector's x coordinate.
@@ -173,26 +170,26 @@ public interface IVector3f {
 	 *            The value subtracted from the vector's y coordinate.
 	 * @param z
 	 *            The value subtracted from the vector's z coordinate.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f subtract(float x, float y, float z, Vector3f store);
+	public Vector3f subtract(float x, float y, float z, Vector3f cache);
 
 	/**
 	 * 
 	 * Subtracts the specified vector's coordinates from this vector's
 	 * coordinates, but stores the resulting values in the specified
-	 * <i>store</i> vector.
+	 * <i>cache</i> vector.
 	 * 
 	 * @param vector
 	 *            The vector whose x, y, and z values will be subtracted from
 	 *            this vector's coordinates.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f subtract(Vector3f vector, Vector3f store);
+	public Vector3f subtract(Vector3f vector, Vector3f cache);
 
 	/**
 	 * Multiplies or scales this vector by the scalar argument.
@@ -223,20 +220,20 @@ public interface IVector3f {
 
 	/**
 	 * Multiplies or scales this vector by the scalar argument, but stores the
-	 * resulting values in the specified <i>store</i> vector.
+	 * resulting values in the specified <i>cache</i> vector.
 	 * 
 	 * @param scalar
 	 *            The scalar value by which this vector's coordinates are
 	 *            multiplied.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
-	public Vector3f multiply(float scalar, Vector3f store);
+	public Vector3f multiply(float scalar, Vector3f cache);
 
 	/**
 	 * Multiplies or scales this vector by the scalar arguments, but stores the
-	 * resulting values in the specified <i>store</i> vector. Each axis can be
+	 * resulting values in the specified <i>cache</i> vector. Each axis can be
 	 * scaled uniquely.
 	 * 
 	 * @param xScale
@@ -248,12 +245,12 @@ public interface IVector3f {
 	 * @param zScale
 	 *            The scalar value by which this vector's z coordinate is
 	 *            multiplied.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
-	 * @return The <i>store</i> vector.
+	 * @return The <i>cache</i> vector.
 	 */
 	public Vector3f multiply(float xScale, float yScale, float zScale,
-			Vector3f store);
+			Vector3f cache);
 
 	/**
 	 * Computes the dot product between this vector and the supplied vector.
@@ -284,7 +281,7 @@ public interface IVector3f {
 
 	/**
 	 * Computes the cross product between this vector and the supplied vector.
-	 * <b>The returned value is the <i>store</i> {@code Vector3f}!!!</b>
+	 * <b>The returned value is the <i>cache</i> {@code Vector3f}!!!</b>
 	 * <p>
 	 * The returned value is the normal (perpendicular vector) for the plane
 	 * formed by two vectors. Note that the normal returned is dependent on the
@@ -294,12 +291,12 @@ public interface IVector3f {
 	 * 
 	 * @param vector
 	 *            The opposite vector in the cross product.
-	 * @param store
+	 * @param cache
 	 *            The vector in which to store the computed values.
 	 * @return The cross product between this vector and the supplied vector.
-	 *         <b>This is the <i>store</i> {@code Vector3f}!!!</b>
+	 *         <b>This is the <i>cache</i> {@code Vector3f}!!!</b>
 	 */
-	public Vector3f cross(Vector3f vector, Vector3f store);
+	public Vector3f cross(Vector3f vector, Vector3f cache);
 
 	/**
 	 * Computes the cross product between this vector and the supplied vector.

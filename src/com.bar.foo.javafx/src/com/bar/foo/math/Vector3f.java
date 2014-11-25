@@ -196,15 +196,15 @@ public class Vector3f implements IVector3f {
 	 * @see com.bar.foo.math.IVector3f#negate(com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f negate(Vector3f store) {
-		if (store != null) {
-			store.x = -x;
-			store.y = -y;
-			store.z = -z;
+	public Vector3f negate(Vector3f cache) {
+		if (cache != null) {
+			cache.x = -x;
+			cache.y = -y;
+			cache.z = -z;
 		} else {
-			store = new Vector3f(-x, -y, -z);
+			cache = new Vector3f(-x, -y, -z);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -227,17 +227,17 @@ public class Vector3f implements IVector3f {
 	 * @see com.bar.foo.math.IVector3f#normalize(com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f normalize(Vector3f store) {
+	public Vector3f normalize(Vector3f cache) {
 		float inverseLength = 1f / length();
-		if (store != null) {
-			store.x = x * inverseLength;
-			store.y = y * inverseLength;
-			store.z = z * inverseLength;
+		if (cache != null) {
+			cache.x = x * inverseLength;
+			cache.y = y * inverseLength;
+			cache.z = z * inverseLength;
 		} else {
-			store = new Vector3f(x * inverseLength, y * inverseLength, z
+			cache = new Vector3f(x * inverseLength, y * inverseLength, z
 					* inverseLength);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -273,15 +273,15 @@ public class Vector3f implements IVector3f {
 	 * com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f add(float x, float y, float z, Vector3f store) {
-		if (store != null) {
-			store.x = this.x + x;
-			store.y = this.y + y;
-			store.z = this.z + z;
+	public Vector3f add(float x, float y, float z, Vector3f cache) {
+		if (cache != null) {
+			cache.x = this.x + x;
+			cache.y = this.y + y;
+			cache.z = this.z + z;
 		} else {
-			store = new Vector3f(this.x + x, this.y + y, this.z + z);
+			cache = new Vector3f(this.x + x, this.y + y, this.z + z);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -291,15 +291,15 @@ public class Vector3f implements IVector3f {
 	 * com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f add(Vector3f vector, Vector3f store) {
-		if (store != null) {
-			store.x = x + vector.x;
-			store.y = y + vector.y;
-			store.z = z + vector.z;
+	public Vector3f add(Vector3f vector, Vector3f cache) {
+		if (cache != null) {
+			cache.x = x + vector.x;
+			cache.y = y + vector.y;
+			cache.z = z + vector.z;
 		} else {
-			store = new Vector3f(x + vector.x, y + vector.y, z + vector.z);
+			cache = new Vector3f(x + vector.x, y + vector.y, z + vector.z);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -335,15 +335,15 @@ public class Vector3f implements IVector3f {
 	 * com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f subtract(float x, float y, float z, Vector3f store) {
-		if (store != null) {
-			store.x = this.x - x;
-			store.y = this.y - y;
-			store.z = this.z - z;
+	public Vector3f subtract(float x, float y, float z, Vector3f cache) {
+		if (cache != null) {
+			cache.x = this.x - x;
+			cache.y = this.y - y;
+			cache.z = this.z - z;
 		} else {
-			store = new Vector3f(this.x - x, this.y - y, this.z - z);
+			cache = new Vector3f(this.x - x, this.y - y, this.z - z);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -353,15 +353,15 @@ public class Vector3f implements IVector3f {
 	 * com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f subtract(Vector3f vector, Vector3f store) {
-		if (store != null) {
-			store.x = x - vector.x;
-			store.y = y - vector.y;
-			store.z = z - vector.z;
+	public Vector3f subtract(Vector3f vector, Vector3f cache) {
+		if (cache != null) {
+			cache.x = x - vector.x;
+			cache.y = y - vector.y;
+			cache.z = z - vector.z;
 		} else {
-			store = new Vector3f(x - vector.x, y - vector.y, z - vector.z);
+			cache = new Vector3f(x - vector.x, y - vector.y, z - vector.z);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -397,15 +397,15 @@ public class Vector3f implements IVector3f {
 	 * com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f multiply(float scalar, Vector3f store) {
-		if (store != null) {
-			store.x = x * scalar;
-			store.y = y * scalar;
-			store.z = z * scalar;
+	public Vector3f multiply(float scalar, Vector3f cache) {
+		if (cache != null) {
+			cache.x = x * scalar;
+			cache.y = y * scalar;
+			cache.z = z * scalar;
 		} else {
-			store = new Vector3f(x * scalar, y * scalar, z * scalar);
+			cache = new Vector3f(x * scalar, y * scalar, z * scalar);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -416,15 +416,15 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f multiply(float xScale, float yScale, float zScale,
-			Vector3f store) {
-		if (store != null) {
-			store.x = x * xScale;
-			store.y = y * yScale;
-			store.z = z * zScale;
+			Vector3f cache) {
+		if (cache != null) {
+			cache.x = x * xScale;
+			cache.y = y * yScale;
+			cache.z = z * zScale;
 		} else {
-			store = new Vector3f(x * xScale, y * yScale, z * zScale);
+			cache = new Vector3f(x * xScale, y * yScale, z * zScale);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
@@ -455,15 +455,15 @@ public class Vector3f implements IVector3f {
 	 * com.bar.foo.math.Vector3f)
 	 */
 	@Override
-	public Vector3f cross(Vector3f vector, Vector3f store) {
-		if (store != null) {
-			store.x = y * vector.z - z * vector.y;
-			store.y = z * vector.x - x * vector.z;
-			store.z = x * vector.y - y * vector.x;
+	public Vector3f cross(Vector3f vector, Vector3f cache) {
+		if (cache != null) {
+			cache.x = y * vector.z - z * vector.y;
+			cache.y = z * vector.x - x * vector.z;
+			cache.z = x * vector.y - y * vector.x;
 		} else {
-			store = cross(vector);
+			cache = cross(vector);
 		}
-		return store;
+		return cache;
 	}
 
 	/*
