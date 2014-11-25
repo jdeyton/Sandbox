@@ -110,6 +110,24 @@ public class Vector3f implements IVector3f {
 		}
 	}
 
+	@Override
+	public boolean equals(Object object) {
+		boolean equals = super.equals(object);
+		if (!equals && object instanceof Vector3f) {
+			Vector3f vector = (Vector3f) object;
+			equals = (x == vector.x && y == vector.y && z == vector.z);
+		}
+		return equals;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = Float.hashCode(x);
+		hash = hash * 31 + Float.hashCode(y);
+		hash = hash * 31 + Float.hashCode(z);
+		return hash;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

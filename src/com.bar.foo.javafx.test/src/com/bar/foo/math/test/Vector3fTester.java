@@ -1,7 +1,11 @@
 package com.bar.foo.math.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -18,6 +22,11 @@ public class Vector3fTester {
 	 * A prefix used when failing with a custom message.
 	 */
 	private static final String failurePrefix = "Vector3fTester failure: ";
+
+	/**
+	 * A random instance used to generate random numbers.
+	 */
+	private static final Random random = new Random(System.nanoTime());
 
 	/**
 	 * This tests the static vectors provided by {@code Vector3f}.
@@ -90,45 +99,136 @@ public class Vector3fTester {
 		return;
 	}
 
+	/**
+	 * Checks that equality and hash code can be determined properly for
+	 * {@code Vector3f}.
+	 */
+	@Test
+	public void checkEquality() {
+		float x = random.nextFloat();
+		float y = random.nextFloat();
+		float z = random.nextFloat();
+
+		Vector3f object = new Vector3f(x, y, z);
+		Vector3f equalObject = new Vector3f(x, y, z);
+		Vector3f unequalObject = null;
+
+		// ---- Check bad arguments to equals. ---- //
+		assertFalse(object.equals(unequalObject));
+		assertFalse(object.equals(1));
+		assertFalse(object.equals("pew pew pew pew"));
+		// ---------------------------------------- //
+
+		// ---- Check valid arguments to equals. ---- //
+		// Set up the unequal object.
+		unequalObject = new Vector3f(x, y, z + 0.00001f);
+
+		// Reflexive.
+		assertTrue(object.equals(object));
+		assertTrue(equalObject.equals(equalObject));
+		// Symmetric.
+		assertTrue(object.equals(equalObject));
+		assertTrue(equalObject.equals(object));
+		// Check the hash codes.
+		assertEquals(object.hashCode(), equalObject.hashCode());
+
+		// Check inequality for both object and equalObject in both directions.
+		assertFalse(object.equals(unequalObject));
+		assertFalse(equalObject.equals(unequalObject));
+		assertFalse(unequalObject.equals(object));
+		assertFalse(unequalObject.equals(equalObject));
+		// Check that the hash codes are different.
+		assertFalse(object.hashCode() == unequalObject.hashCode());
+		assertFalse(equalObject.hashCode() == unequalObject.hashCode());
+		// ------------------------------------------ //
+
+		return;
+	}
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkSet() {
-		
+		fail("Not implemented.");
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkNegate() {
-		
+		fail("Not implemented.");
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkNormalize() {
-		
+		fail("Not implemented.");
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkLength() {
-		
+		fail("Not implemented.");
+
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkAddition() {
-		
+		fail("Not implemented.");
+
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkSubtraction() {
-		
+		fail("Not implemented.");
+
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkMultiplication() {
-		
+		fail("Not implemented.");
+
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkDistance() {
-		
+		fail("Not implemented.");
+
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkDotProduct() {
-		
+		fail("Not implemented.");
+
 	}
-	
+
+	/**
+	 * TODO
+	 */
+	@Test
 	public void checkCrossProduct() {
-		
+		fail("Not implemented.");
+
 	}
-	
-	
 }
