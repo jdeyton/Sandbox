@@ -197,7 +197,7 @@ public class Vector3fTester {
 			otherVector = null;
 			vector.set(otherVector);
 			fail(failurePrefix
-					+ " Calling set(null) should throw an exception.");
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
@@ -368,7 +368,13 @@ public class Vector3fTester {
 	}
 
 	/**
-	 * TODO
+	 * Checks that the addition operations provided by {@code Vector3f} are
+	 * calculated correctly.
+	 * 
+	 * @see Vector3f#add(float, float, float)
+	 * @see Vector3f#add(Vector3f)
+	 * @see Vector3f#add(float, float, float, Vector3f)
+	 * @see Vector3f#add(Vector3f, Vector3f)
 	 */
 	@Test
 	public void checkAddition() {
@@ -382,7 +388,104 @@ public class Vector3fTester {
 		Vector3f cache = new Vector3f();
 		Vector3f newCache = null;
 
-		fail("Not implemented.");
+		// Generate values to add.
+		float x2 = random.nextFloat();
+		float y2 = random.nextFloat();
+		float z2 = random.nextFloat();
+		Vector3f vector2 = new Vector3f(x2, y2, z2);
+
+		// Get the expected values.
+		final float addedX = x + x2;
+		final float addedY = y + y2;
+		final float addedZ = z + z2;
+
+		// ---- Check the two non-cache (local) operations. ---- //
+		// Add x, y, z to the zero vector.
+		assertSame(vector, vector.add(x, y, z)); // Returned: vector
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+
+		// Add x2, y2, z2 to the vector using the vector form of the operation.
+		assertSame(vector, vector.add(vector2)); // Returned: vector
+		assertEquals(addedX, vector.x, delta);
+		assertEquals(addedY, vector.y, delta);
+		assertEquals(addedZ, vector.z, delta);
+		// ----------------------------------------------------- //
+
+		// ---- Check the two cache-based operations. ---- //
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y, z2 to the vector using the float form.
+		assertSame(cache, vector.add(x2, y2, z2, cache)); // Returned: cache
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(addedX, cache.x, delta);
+		assertEquals(addedY, cache.y, delta);
+		assertEquals(addedZ, cache.z, delta);
+
+		// Add x2, y, z2 to the vector using the vector form.
+		assertSame(cache, vector.add(vector2, cache)); // Returned: cache
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(addedX, cache.x, delta);
+		assertEquals(addedY, cache.y, delta);
+		assertEquals(addedZ, cache.z, delta);
+		// ----------------------------------------------- //
+
+		// ---- Check that the two cache-based ops handle null cache. ---- //
+		// Reset the vector to the x, y, and z values.
+		vector.set(x, y, z);
+
+		// Add x2, y, z2 to the vector using the float form.
+		newCache = null;
+		// Make sure the return value is a new vector.
+		vector.add(x2, y2, z2, newCache);
+		assertNotSame(newCache, vector);
+		assertNotSame(newCache, cache);
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(addedX, cache.x, delta);
+		assertEquals(addedY, cache.y, delta);
+		assertEquals(addedZ, cache.z, delta);
+
+		// Add x2, y, z2 to the vector using the vector form.
+		newCache = null;
+		// Make sure the return value is a new vector.
+		vector.add(x2, y2, z2, newCache);
+		assertNotSame(newCache, vector);
+		assertNotSame(newCache, cache);
+		// The values of the original vector should not change.
+		assertEquals(x, vector.x, delta);
+		assertEquals(y, vector.y, delta);
+		assertEquals(z, vector.z, delta);
+		// The values in the cache should be the expected values.
+		assertEquals(addedX, cache.x, delta);
+		assertEquals(addedY, cache.y, delta);
+		assertEquals(addedZ, cache.z, delta);
+		// --------------------------------------------------------------- //
+
+		// ---- Check for null pointer exceptions. ---- //
+		// These should only happen when a non-cache vector is passed.
+		try {
+			vector2 = null;
+			vector.add(vector2);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// -------------------------------------------- //
 
 		return;
 	}
