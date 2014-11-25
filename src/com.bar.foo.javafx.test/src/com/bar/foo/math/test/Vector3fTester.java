@@ -344,8 +344,6 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
-		Vector3f cache = new Vector3f();
-		Vector3f newCache = null;
 
 		// Get the expected values.
 		final float lengthSquared = x * x + y * y + z * z;
@@ -381,6 +379,8 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
 
 		fail("Not implemented.");
 
@@ -399,6 +399,8 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
 
 		fail("Not implemented.");
 
@@ -417,6 +419,8 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
 
 		fail("Not implemented.");
 
@@ -471,6 +475,8 @@ public class Vector3fTester {
 		float z = random.nextFloat();
 
 		Vector3f vector = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f newCache = null;
 
 		fail("Not implemented.");
 
