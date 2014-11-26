@@ -3,6 +3,7 @@ package com.bar.foo.math.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
@@ -674,6 +675,60 @@ public class Matrix3fTester {
 		assertSame(matrix, matrix.set(3, 3, 0f));
 		assertEquals(expectedMatrix, matrix);
 		// ------------------------------------ //
+
+		return;
+	}
+
+	/**
+	 * This tests {@link Matrix3f#equals(Object)} and
+	 * {@link Matrix3f#hashCode()}.
+	 */
+	@Test
+	public void checkEquality() {
+		Matrix3f object;
+		Matrix3f equalObject;
+		Matrix3f unequalObject;
+		final Matrix3f nullMatrix = null;
+
+		// Generate random numbers for some of the following tests.
+		final float m00 = random.nextFloat();
+		final float m01 = random.nextFloat();
+		final float m02 = random.nextFloat();
+		final float m10 = random.nextFloat();
+		final float m11 = random.nextFloat();
+		final float m12 = random.nextFloat();
+		final float m20 = random.nextFloat();
+		final float m21 = random.nextFloat();
+		final float m22 = Float.MIN_NORMAL;
+
+		object = new Matrix3f(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+		equalObject = new Matrix3f(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+		unequalObject = new Matrix3f(object);
+		unequalObject.m22 = m22 * 1.1f;
+
+		// ---- Check bad arguments to equals. ---- //
+		assertFalse(object.equals(nullMatrix));
+		assertFalse(object.equals(42));
+		assertFalse(object.equals("the one"));
+		// ---------------------------------------- //
+
+		// ---- Check valid arguments to equals. ---- //
+		// Reflexive
+		assertTrue(object.equals(object));
+		assertTrue(equalObject.equals(equalObject));
+		assertTrue(unequalObject.equals(unequalObject));
+		// Symmetric
+		assertTrue(object.equals(equalObject));
+		assertTrue(equalObject.equals(object));
+		assertFalse(object.equals(unequalObject));
+		assertFalse(unequalObject.equals(object));
+		assertFalse(equalObject.equals(unequalObject));
+		assertFalse(unequalObject.equals(equalObject));
+		// Check the hash codes.
+		assertTrue(object.hashCode() == equalObject.hashCode());
+		assertFalse(object.hashCode() == unequalObject.hashCode());
+		assertFalse(equalObject.hashCode() == unequalObject.hashCode());
+		// ------------------------------------------ //
 
 		return;
 	}

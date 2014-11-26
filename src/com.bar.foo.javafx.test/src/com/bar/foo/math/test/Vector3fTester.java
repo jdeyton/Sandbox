@@ -140,21 +140,19 @@ public class Vector3fTester {
 		// Set up the unequal object.
 		unequalObject = new Vector3f(x, y, z + 0.00001f);
 
-		// Reflexive.
+		// Reflexive
 		assertTrue(object.equals(object));
 		assertTrue(equalObject.equals(equalObject));
-		// Symmetric.
+		assertTrue(unequalObject.equals(unequalObject));
+		// Symmetric
 		assertTrue(object.equals(equalObject));
 		assertTrue(equalObject.equals(object));
-		// Check the hash codes.
-		assertEquals(object.hashCode(), equalObject.hashCode());
-
-		// Check inequality for both object and equalObject in both directions.
 		assertFalse(object.equals(unequalObject));
-		assertFalse(equalObject.equals(unequalObject));
 		assertFalse(unequalObject.equals(object));
+		assertFalse(equalObject.equals(unequalObject));
 		assertFalse(unequalObject.equals(equalObject));
-		// Check that the hash codes are different.
+		// Check the hash codes.
+		assertTrue(object.hashCode() == equalObject.hashCode());
 		assertFalse(object.hashCode() == unequalObject.hashCode());
 		assertFalse(equalObject.hashCode() == unequalObject.hashCode());
 		// ------------------------------------------ //

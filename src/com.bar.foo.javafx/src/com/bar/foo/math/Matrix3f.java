@@ -216,7 +216,7 @@ public class Matrix3f {
 		}
 		return;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -226,24 +226,38 @@ public class Matrix3f {
 	public boolean equals(Object object) {
 		boolean equals = (this == object);
 		if (!equals && object instanceof Matrix3f) {
-			float delta = 1e-6f;
-
 			Matrix3f matrix = (Matrix3f) object;
-			equals = (Math.abs(m00 - matrix.m00) < delta
-					&& Math.abs(m01 - matrix.m01) < delta
-					&& Math.abs(m02 - matrix.m02) < delta
-					&& Math.abs(m10 - matrix.m10) < delta
-					&& Math.abs(m11 - matrix.m11) < delta
-					&& Math.abs(m12 - matrix.m12) < delta
-					&& Math.abs(m20 - matrix.m20) < delta
-					&& Math.abs(m21 - matrix.m21) < delta && Math.abs(m22
-					- matrix.m22) < delta);
+			equals = (Float.compare(m00, matrix.m00) == 0
+					&& Float.compare(m01, matrix.m01) == 0
+					&& Float.compare(m02, matrix.m02) == 0
+					&& Float.compare(m10, matrix.m10) == 0
+					&& Float.compare(m11, matrix.m11) == 0
+					&& Float.compare(m12, matrix.m12) == 0
+					&& Float.compare(m20, matrix.m20) == 0
+					&& Float.compare(m21, matrix.m21) == 0 && Float.compare(
+					m22, matrix.m22) == 0);
 		}
 		return equals;
 	}
-	
-	// TODO hashCode
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		int hash = Float.hashCode(m00);
+		hash = hash * 31 + Float.hashCode(m01);
+		hash = hash * 31 + Float.hashCode(m02);
+		hash = hash * 31 + Float.hashCode(m10);
+		hash = hash * 31 + Float.hashCode(m11);
+		hash = hash * 31 + Float.hashCode(m12);
+		hash = hash * 31 + Float.hashCode(m20);
+		hash = hash * 31 + Float.hashCode(m21);
+		return hash * 31 + Float.hashCode(m22);
+	}
+
 	/**
 	 * Sets the values of the matrix to the specified elements. A value
 	 * {@code mij} corresponds to the element in the <i>i</i>th row and
@@ -604,5 +618,4 @@ public class Matrix3f {
 		return cache;
 	}
 
-	
 }

@@ -140,7 +140,9 @@ public class Vector3f implements IVector3f {
 		boolean equals = super.equals(object);
 		if (!equals && object instanceof Vector3f) {
 			Vector3f vector = (Vector3f) object;
-			equals = (x == vector.x && y == vector.y && z == vector.z);
+			equals = (Float.compare(x, vector.x) == 0
+					&& Float.compare(y, vector.y) == 0 && Float.compare(z,
+					vector.z) == 0);
 		}
 		return equals;
 	}
@@ -154,8 +156,7 @@ public class Vector3f implements IVector3f {
 	public int hashCode() {
 		int hash = Float.hashCode(x);
 		hash = hash * 31 + Float.hashCode(y);
-		hash = hash * 31 + Float.hashCode(z);
-		return hash;
+		return hash * 31 + Float.hashCode(z);
 	}
 
 	/*
