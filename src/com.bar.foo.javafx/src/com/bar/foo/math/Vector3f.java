@@ -480,8 +480,8 @@ public class Vector3f implements IVector3f {
 	@Override
 	public Vector3f crossLocal(Vector3f vector) {
 		float x = y * vector.z - z * vector.y;
-		float y = z * vector.x - x * vector.z;
-		z = x * vector.y - y * vector.x;
+		float y = z * vector.x - this.x * vector.z;
+		z = this.x * vector.y - this.y * vector.x;
 		this.x = x;
 		this.y = y;
 		return this;

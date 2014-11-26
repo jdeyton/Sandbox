@@ -847,7 +847,7 @@ public class Vector3fTester {
 		float x = random.nextFloat();
 		float y = random.nextFloat();
 		float z = random.nextFloat();
-		
+
 		// The simple case is the dot product between the random vector and the
 		// identity vector.
 		float dot = x + y + z;
@@ -857,7 +857,7 @@ public class Vector3fTester {
 		vector2.set(Vector3f.IDENTITY);
 		// Check the dot product.
 		assertEquals(dot, vector.dot(vector2), delta);
-		
+
 		// Now try a more complicated example with random values.
 		float x2 = random.nextFloat();
 		float y2 = random.nextFloat();
@@ -895,21 +895,93 @@ public class Vector3fTester {
 	}
 
 	/**
-	 * TODO
+	 * Checks the computations of cross products between two vectors. A very
+	 * simple case and a random case are both tested for good measure.
+	 * 
+	 * @see Vector3f#cross(Vector3f)
+	 * @see Vector3f#cross(Vector3f, Vector3f)
+	 * @see Vector3f#crossLocal(Vector3f)
 	 */
 	@Test
 	public void checkCrossProduct() {
-		// Generate some random coordinates. Since float is a primitive type, we
-		// don't have to worry about pass-by-reference affecting test results.
+		Vector3f vector = new Vector3f();
+		Vector3f vector2 = new Vector3f();
+		Vector3f cache = new Vector3f();
+		Vector3f nullVector = null;
+
+		// The simple case is the cross product between the x and z axes. This
+		// should produce the y axis. Note that the z axis must be specified
+		// first in the cross product, i.e. x cross z = -y, but z cross x = y.
+		vector.set(Vector3f.UNIT_Z);
+		vector2.set(Vector3f.UNIT_X);
+		// Try the default cross product, which returns a new vector.
+		assertEquals(Vector3f.UNIT_Y, vector.cross(vector2));
+		assertNotSame(vector, vector.cross(vector2));
+		// Try the version with the cache specified.
+		assertEquals(Vector3f.UNIT_Y, vector.cross(vector2, cache));
+		assertSame(cache, vector.cross(vector2, cache));
+		assertEquals(Vector3f.UNIT_Y, cache);
+		// Try the local cross product.
+		assertSame(vector, vector.crossLocal(vector2));
+		assertEquals(Vector3f.UNIT_Y, vector);
+
+		// Try a more difficult case with random values.
 		float x = random.nextFloat();
 		float y = random.nextFloat();
 		float z = random.nextFloat();
+		float x2 = random.nextFloat();
+		float y2 = random.nextFloat();
+		float z2 = random.nextFloat();
+		// Determine the cross product.
+		float crossX = y * z2 - z * y2;
+		float crossY = z * x2 - x * z2;
+		float crossZ = x * y2 - y * x2;
+		Vector3f cross = new Vector3f(crossX, crossY, crossZ);
+		// Update the two vectors in question.
+		vector.set(x, y, z);
+		vector2.set(x2, y2, z2);
+		// Try the default cross product, which returns a new vector.
+		assertEquals(cross, vector.cross(vector2));
+		assertNotSame(cross, vector.cross(vector2));
+		// Try the version with the cache specified.
+		assertEquals(cross, vector.cross(vector2, cache));
+		assertSame(cache, vector.cross(vector2, cache));
+		assertEquals(cross, cache);
+		// Try the local cross product.
+		assertSame(vector, vector.crossLocal(vector2));
+		assertEquals(cross, vector);
 
-		Vector3f vector = new Vector3f();
-		Vector3f cache = new Vector3f();
-		Vector3f newCache = null;
+		// Make sure the cache version can create a new copy if the cache
+		// argument is null.
+		cache = vector.set(x, y, z).cross(vector2, nullVector);
+		assertEquals(cross, cache);
+		assertNotSame(cache, vector);
 
-		fail("Not implemented.");
+		// Since both methods take a vector argument, use the cach
+		// ---- Check for null pointer exceptions. ---- //
+		// These should only happen when a non-cache vector is passed.
+		try {
+			vector.cross(nullVector);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			vector.cross(nullVector, cache);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			vector.crossLocal(nullVector);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// -------------------------------------------- //
 
 		return;
 	}
