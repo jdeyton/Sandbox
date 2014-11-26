@@ -13,7 +13,7 @@ package com.bar.foo.math;
 public class FloatMath {
 
 	// TODO Test this class.
-
+	
 	/**
 	 * Computes and returns the square root of a float value.
 	 * 

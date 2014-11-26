@@ -1,6 +1,8 @@
 package com.bar.foo.math.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
@@ -70,9 +72,10 @@ public class Matrix3fTester {
 
 		Matrix3f matrix;
 		Matrix3f copy;
+		Vector3f v0, v1, v2;
 		final Matrix3f nullMatrix = null;
 		final Vector3f nullVector = null;
-		Vector3f v0, v1, v2;
+		final Matrix3f expectedMatrix;
 
 		// Generate random numbers for some of the following tests.
 		final float m00 = random.nextFloat();
@@ -111,6 +114,11 @@ public class Matrix3fTester {
 		assertEquals(m22, matrix.m22, delta);
 		// ------------------------------------- //
 
+		// We've now tested the full constructor satisfactorily. Now construct
+		// the expected matrix so we can reduce the test code by a factor of 9.
+		expectedMatrix = new Matrix3f(m00, m01, m02, m10, m11, m12, m20, m21,
+				m22);
+
 		// ---- Check the first default Vector3f-based constructor. ---- //
 		// Set up the vectors so that the resulting matrix should be the same as
 		// above. Note that each vector corresponds to a row in the matrix.
@@ -119,15 +127,7 @@ public class Matrix3fTester {
 		v2 = new Vector3f(m20, m21, m22);
 
 		matrix = new Matrix3f(v0, v1, v2);
-		assertEquals(m00, matrix.m00, delta);
-		assertEquals(m01, matrix.m01, delta);
-		assertEquals(m02, matrix.m02, delta);
-		assertEquals(m10, matrix.m10, delta);
-		assertEquals(m11, matrix.m11, delta);
-		assertEquals(m12, matrix.m12, delta);
-		assertEquals(m20, matrix.m20, delta);
-		assertEquals(m21, matrix.m21, delta);
-		assertEquals(m22, matrix.m22, delta);
+		assertEquals(expectedMatrix, matrix);
 		// ------------------------------------------------------------- //
 
 		// ---- Check the full Vector3f-based constructor. ---- //
@@ -138,15 +138,7 @@ public class Matrix3fTester {
 		v2 = new Vector3f(m20, m21, m22);
 
 		matrix = new Matrix3f(v0, v1, v2, true);
-		assertEquals(m00, matrix.m00, delta);
-		assertEquals(m01, matrix.m01, delta);
-		assertEquals(m02, matrix.m02, delta);
-		assertEquals(m10, matrix.m10, delta);
-		assertEquals(m11, matrix.m11, delta);
-		assertEquals(m12, matrix.m12, delta);
-		assertEquals(m20, matrix.m20, delta);
-		assertEquals(m21, matrix.m21, delta);
-		assertEquals(m22, matrix.m22, delta);
+		assertEquals(expectedMatrix, matrix);
 
 		// Set up the vectors so that the resulting matrix should be the same as
 		// above. Note that each vector corresponds to a column in the matrix.
@@ -155,79 +147,55 @@ public class Matrix3fTester {
 		v2 = new Vector3f(m02, m12, m22);
 
 		matrix = new Matrix3f(v0, v1, v2, false);
-		assertEquals(m00, matrix.m00, delta);
-		assertEquals(m01, matrix.m01, delta);
-		assertEquals(m02, matrix.m02, delta);
-		assertEquals(m10, matrix.m10, delta);
-		assertEquals(m11, matrix.m11, delta);
-		assertEquals(m12, matrix.m12, delta);
-		assertEquals(m20, matrix.m20, delta);
-		assertEquals(m21, matrix.m21, delta);
-		assertEquals(m22, matrix.m22, delta);
+		assertEquals(expectedMatrix, matrix);
 		// ---------------------------------------------------- //
 
 		// ---- Check the copy constructor. ---- //
 		// Try it with a valid matrix.
 		copy = new Matrix3f(matrix);
-		assertEquals(m00, copy.m00, delta);
-		assertEquals(m01, copy.m01, delta);
-		assertEquals(m02, copy.m02, delta);
-		assertEquals(m10, copy.m10, delta);
-		assertEquals(m11, copy.m11, delta);
-		assertEquals(m12, copy.m12, delta);
-		assertEquals(m20, copy.m20, delta);
-		assertEquals(m21, copy.m21, delta);
-		assertEquals(m22, copy.m22, delta);
-		
+		assertEquals(expectedMatrix, matrix);
+
 		// Try it with a null matrix. All values should revert to 0.
 		copy = new Matrix3f(nullMatrix);
-		assertEquals(0f, copy.m00, delta);
-		assertEquals(0f, copy.m01, delta);
-		assertEquals(0f, copy.m02, delta);
-		assertEquals(0f, copy.m10, delta);
-		assertEquals(0f, copy.m11, delta);
-		assertEquals(0f, copy.m12, delta);
-		assertEquals(0f, copy.m20, delta);
-		assertEquals(0f, copy.m21, delta);
-		assertEquals(0f, copy.m22, delta);		
+		assertEquals(Matrix3f.ZERO, copy);
 		// ------------------------------------- //
-		
+
 		// ---- Make sure null pointers throw exceptions. ---- //
 		// Check all possible nulls in the default vector-based constructor.
 		try {
 			matrix = new Matrix3f(nullVector, v1, v2);
-			fail(failurePrefix + "Operation supports null matrix argument!");
+			fail(failurePrefix + "Operation supports null vector argument!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		try {
 			matrix = new Matrix3f(v0, nullVector, v2);
-			fail(failurePrefix + "Operation supports null matrix argument!");
+			fail(failurePrefix + "Operation supports null vector argument!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		try {
 			matrix = new Matrix3f(v0, v1, nullVector);
-			fail(failurePrefix + "Operation supports null matrix argument!");
+			fail(failurePrefix + "Operation supports null vector argument!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		// Check all possible nulls in the other vector-based constructor.
 		try {
 			matrix = new Matrix3f(nullVector, v1, v2, false);
-			fail(failurePrefix + "Operation supports null matrix argument!");
+			fail(failurePrefix + "Operation supports null vector argument!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		try {
 			matrix = new Matrix3f(v0, nullVector, v2, false);
-			fail(failurePrefix + "Operation supports null matrix argument!");
+			fail(failurePrefix + "Operation supports null vector argument!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
 		try {
 			matrix = new Matrix3f(v0, v1, nullVector, false);
-			fail(failurePrefix + "Operation supports null matrix argument!");
+			fail(failurePrefix + "Operation supports null vector argument!");
 		} catch (NullPointerException e) {
 			// Nothing to do.
 		}
@@ -236,4 +204,477 @@ public class Matrix3fTester {
 		return;
 	}
 
+	/**
+	 * This tests all of the set methods provided by {@code Matrix3f}.
+	 */
+	@Test
+	public void checkSet() {
+		Matrix3f matrix;
+		Vector3f v0, v1, v2;
+		final Matrix3f nullMatrix = null;
+		final Vector3f nullVector = null;
+		final Matrix3f expectedMatrix;
+
+		// Generate random numbers for some of the following tests.
+		final float m00 = random.nextFloat();
+		final float m01 = random.nextFloat();
+		final float m02 = random.nextFloat();
+		final float m10 = random.nextFloat();
+		final float m11 = random.nextFloat();
+		final float m12 = random.nextFloat();
+		final float m20 = random.nextFloat();
+		final float m21 = random.nextFloat();
+		final float m22 = random.nextFloat();
+
+		matrix = new Matrix3f();
+
+		// Set up the expected matrix values so we don't have to compare each
+		// matrix value manually.
+		expectedMatrix = new Matrix3f(m00, m01, m02, m10, m11, m12, m20, m21,
+				m22);
+
+		// ---- Check set(float, float, ... float) ---- //
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix,
+				matrix.set(m00, m01, m02, m10, m11, m12, m20, m21, m22));
+		assertEquals(expectedMatrix, matrix);
+		// -------------------------------------------- //
+
+		// ---- Check set(Vector3f, Vector3f, Vector3f) ---- //
+		// Set up the vectors so that the resulting matrix should be the same as
+		// above. Note that each vector corresponds to a row in the matrix.
+		v0 = new Vector3f(m00, m01, m02);
+		v1 = new Vector3f(m10, m11, m12);
+		v2 = new Vector3f(m20, m21, m22);
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.set(v0, v1, v2));
+		assertEquals(expectedMatrix, matrix);
+
+		// Passing in a null vector shouldn't succeed regardless of which
+		// argument is null.
+		try {
+			matrix.set(nullVector, v1, v2);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			matrix.set(v0, nullVector, v2);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			matrix.set(v0, v1, nullVector);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// ------------------------------------------------- //
+
+		// ---- Check set(Vector3f, Vector3f, Vector3f, boolean) ---- //
+		// Set up the vectors so that the resulting matrix should be the same as
+		// above. Note that each vector corresponds to a row in the matrix.
+		v0 = new Vector3f(m00, m01, m02);
+		v1 = new Vector3f(m10, m11, m12);
+		v2 = new Vector3f(m20, m21, m22);
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.set(v0, v1, v2, true));
+		assertEquals(expectedMatrix, matrix);
+
+		// Set up the vectors so that the resulting matrix should be the same as
+		// above. Note that each vector corresponds to a column in the matrix.
+		v0 = new Vector3f(m00, m10, m20);
+		v1 = new Vector3f(m01, m11, m21);
+		v2 = new Vector3f(m02, m12, m22);
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.set(v0, v1, v2, false));
+		assertEquals(expectedMatrix, matrix);
+
+		// Passing in a null vector shouldn't succeed regardless of which
+		// argument is null.
+		try {
+			matrix.set(nullVector, v1, v2, false);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			matrix.set(v0, nullVector, v2, false);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			matrix.set(v0, v1, nullVector, false);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// ---------------------------------------------------------- //
+
+		// ---- Check set(Matrix3f) ---- //
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.set(expectedMatrix));
+		assertEquals(expectedMatrix, matrix);
+
+		// Try it with a null matrix. An exception should be thrown.
+		try {
+			matrix.set(nullMatrix);
+			fail(failurePrefix + "Operation supports null matrix argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// ----------------------------- //
+
+		// ---- Check setRow(int, float, float, float) ---- //
+		// Below, we set row 0, then row 1, and lastly row 3, testing after each
+		// call. After setting row 3, the matrix should be the same as the
+		// expected matrix. We can then test some invalid arguments.
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.setRow(0, m00, m01, m02));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(0f, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the second row.
+		assertSame(matrix, matrix.setRow(1, m10, m11, m12));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(m12, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the third row.
+		assertSame(matrix, matrix.setRow(2, m20, m21, m22));
+		assertEquals(expectedMatrix, matrix);
+
+		// Passing in an invalid row shouldn't change anything.
+		assertSame(matrix, matrix.setRow(-1, 0f, 0f, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.setRow(3, 0f, 0f, 0f));
+		assertEquals(expectedMatrix, matrix);
+		// ------------------------------------------------ //
+
+		// ---- Check setRow(int, Vector3f) ---- //
+		// Below, we set row 0, then row 1, and lastly row 3, testing after each
+		// call. After setting row 3, the matrix should be the same as the
+		// expected matrix. We can then test some invalid arguments.
+
+		// Set up the vectors so that the resulting matrix should be the same as
+		// above. Note that each vector corresponds to a row in the matrix.
+		v0 = new Vector3f(m00, m01, m02);
+		v1 = new Vector3f(m10, m11, m12);
+		v2 = new Vector3f(m20, m21, m22);
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.setRow(0, v0));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(0f, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the second row.
+		assertSame(matrix, matrix.setRow(1, v1));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(m12, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the third row.
+		assertSame(matrix, matrix.setRow(2, v2));
+		assertEquals(expectedMatrix, matrix);
+
+		// Passing in a null vector should throw an exception.
+		try {
+			matrix.setRow(0, nullVector);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+
+		// Passing in an invalid row shouldn't change anything.
+		assertSame(matrix, matrix.setRow(-1, Vector3f.ZERO));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.setRow(3, Vector3f.ZERO));
+		assertEquals(expectedMatrix, matrix);
+		// ------------------------------------- //
+
+		// ---- Check setColumn(int, float, float, float) ---- //
+		// Below, we set column 0, then column 1, and lastly column 3, testing
+		// after each call. After setting column 3, the matrix should be the
+		// same as the expected matrix. We can then test some invalid arguments.
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.setColumn(0, m00, m10, m20));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(0f, matrix.m01, delta);
+		assertEquals(0f, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(m20, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the second column.
+		assertSame(matrix, matrix.setColumn(1, m01, m11, m21));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(0f, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(m20, matrix.m20, delta);
+		assertEquals(m21, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the third column.
+		assertSame(matrix, matrix.setColumn(2, m02, m12, m22));
+		assertEquals(expectedMatrix, matrix);
+
+		// Passing in an invalid row shouldn't change anything.
+		assertSame(matrix, matrix.setColumn(-1, 0f, 0f, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.setColumn(3, 0f, 0f, 0f));
+		assertEquals(expectedMatrix, matrix);
+		// --------------------------------------------------- //
+
+		// ---- Check setColumn(int, Vector3f) ---- //
+		// Below, we set column 0, then column 1, and lastly column 3, testing
+		// after each call. After setting column 3, the matrix should be the
+		// same as the expected matrix. We can then test some invalid arguments.
+
+		// Set up the vectors so that the resulting matrix should be the same as
+		// above. Note that each vector corresponds to a column in the matrix.
+		v0 = new Vector3f(m00, m10, m20);
+		v1 = new Vector3f(m01, m11, m21);
+		v2 = new Vector3f(m02, m12, m22);
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		// Check that set works and check its return value.
+		assertSame(matrix, matrix.setColumn(0, v0));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(0f, matrix.m01, delta);
+		assertEquals(0f, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(m20, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the second column.
+		assertSame(matrix, matrix.setColumn(1, v1));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(0f, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(m20, matrix.m20, delta);
+		assertEquals(m21, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		// Check the third column.
+		assertSame(matrix, matrix.setColumn(2, v2));
+		assertEquals(expectedMatrix, matrix);
+
+		// Passing in a null vector should throw an exception.
+		try {
+			matrix.setColumn(0, nullVector);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+
+		// Passing in an invalid column shouldn't change anything.
+		assertSame(matrix, matrix.setColumn(-1, Vector3f.ZERO));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.setColumn(3, Vector3f.ZERO));
+		assertEquals(expectedMatrix, matrix);
+		// ---------------------------------------- //
+
+		// ---- Check set(int, int, float) ---- //
+		// Below, we test setting each individual position, testing after each
+		// call. By the end, we can just compare the matrix against the expected
+		// matrix.
+
+		// Zero out the matrix.
+		matrix.set(Matrix3f.ZERO);
+		assertFalse(expectedMatrix.equals(matrix));
+
+		assertSame(matrix, matrix.set(0, 0, m00));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(0f, matrix.m01, delta);
+		assertEquals(0f, matrix.m02, delta);
+		assertEquals(0f, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(0, 1, m01));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(0f, matrix.m02, delta);
+		assertEquals(0f, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(0, 2, m02));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(0f, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(1, 0, m10));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(0f, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(1, 1, m11));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(0f, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(1, 2, m12));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(m12, matrix.m12, delta);
+		assertEquals(0f, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(2, 0, m20));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(m12, matrix.m12, delta);
+		assertEquals(m20, matrix.m20, delta);
+		assertEquals(0f, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(2, 1, m21));
+		assertEquals(m00, matrix.m00, delta);
+		assertEquals(m01, matrix.m01, delta);
+		assertEquals(m02, matrix.m02, delta);
+		assertEquals(m10, matrix.m10, delta);
+		assertEquals(m11, matrix.m11, delta);
+		assertEquals(m12, matrix.m12, delta);
+		assertEquals(m20, matrix.m20, delta);
+		assertEquals(m21, matrix.m21, delta);
+		assertEquals(0f, matrix.m22, delta);
+
+		assertSame(matrix, matrix.set(2, 2, m22));
+		assertEquals(expectedMatrix, matrix);
+
+		// Now try some invalid locations. Below, I try every (invalid)
+		// combination of
+		// invalid/valid row/column.
+		assertSame(matrix, matrix.set(-1, -1, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(-1, 0, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(-1, 3, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(0, -1, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(0, 3, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(3, -1, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(3, 0, 0f));
+		assertEquals(expectedMatrix, matrix);
+		assertSame(matrix, matrix.set(3, 3, 0f));
+		assertEquals(expectedMatrix, matrix);
+		// ------------------------------------ //
+
+		return;
+	}
 }
