@@ -4,12 +4,32 @@
 package com.bar.foo.math;
 
 /**
+ * This class provides a vector composed of 3 floats as an alternative to the
+ * JavaFX library. This class includes methods to normalize the vector or
+ * compute vector length, distance between two vectors, dot products, and cross
+ * products.
+ * <p>
+ * Methods that return a {@code Vector3f} will return either a reference to
+ * {@code this} or a reference to the specified <i>cache</i> {@code Vector3f}
+ * (or a new {@code Vector3f} if the cache was specified as {@code null}). The
+ * exception to this rule is {@link #cross(Vector3f)}, which <i>always returns a
+ * new {@code Vector3f} containing the cross product by default</i>. If you wish
+ * to compute the cross product and overwrite the contents of {@code this}, you
+ * may use {@link #crossLocal(Vector3f)} instead.
+ * </p>
+ * <p>
+ * This class additionally provides static vectors representing the zero,
+ * identity, and unit vectors as a convenience. Note that if you plan to
+ * manipulate these values, <b>DO NOT MANIPULATE THESE VALUES!</b> Instead, use
+ * <b><i>copies</i></b> of them by calling the copy constructor, e.g.,
+ * {@code new Vector3f(Vector3f.ZERO)} or by using them with the set operation,
+ * e.g., {@code myVector.set(Vector3f.IDENTITY)}.
+ * </p>
+ * 
  * @author Jordan Deyton
  *
  */
 public class Vector3f implements IVector3f {
-
-	// TODO Test this class.
 
 	/**
 	 * The x coordinate of the vector.
@@ -110,6 +130,11 @@ public class Vector3f implements IVector3f {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object object) {
 		boolean equals = super.equals(object);
@@ -120,6 +145,11 @@ public class Vector3f implements IVector3f {
 		return equals;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		int hash = Float.hashCode(x);
