@@ -832,19 +832,64 @@ public class Vector3fTester {
 	}
 
 	/**
-	 * TODO
+	 * Checks the computations of dot products between two vectors. A very
+	 * simple case and a random case are both tested for good measure.
+	 * 
+	 * @see Vector3f#dot(Vector3f)
 	 */
 	@Test
 	public void checkDotProduct() {
-		// Generate some random coordinates. Since float is a primitive type, we
-		// don't have to worry about pass-by-reference affecting test results.
+		Vector3f vector = new Vector3f();
+		Vector3f vector2 = new Vector3f();
+		Vector3f nullVector = null;
+
+		// Generate random values.
 		float x = random.nextFloat();
 		float y = random.nextFloat();
 		float z = random.nextFloat();
+		
+		// The simple case is the dot product between the random vector and the
+		// identity vector.
+		float dot = x + y + z;
 
-		Vector3f vector = new Vector3f();
+		// Since both methods take a vector argument, use the cache.
+		vector.set(x, y, z);
+		vector2.set(Vector3f.IDENTITY);
+		// Check the dot product.
+		assertEquals(dot, vector.dot(vector2), delta);
+		
+		// Now try a more complicated example with random values.
+		float x2 = random.nextFloat();
+		float y2 = random.nextFloat();
+		float z2 = random.nextFloat();
+		// Determine the dot product.
+		double dx = (x * x2);
+		double dy = (y * y2);
+		double dz = (z * z2);
+		dot = (float) (dx + dy + dz);
+		// Update the two vectors involved.
+		vector.set(x, y, z);
+		vector2.set(x2, y2, z2);
+		// Check the dot product.
+		assertEquals(dot, vector.dot(vector2), delta);
 
-		fail("Not implemented.");
+		// ---- Check for null pointer exceptions. ---- //
+		// These should only happen when a non-cache vector is passed.
+		try {
+			vector.dot(nullVector);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			vector.dot(nullVector);
+			fail(failurePrefix
+					+ "Operation supports null vector argument for vector that is not used as a cache!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// -------------------------------------------- //
 
 		return;
 	}
