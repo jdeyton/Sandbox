@@ -22,6 +22,9 @@ import com.bar.foo.math.Vector3f;
  */
 public class Vector3fTester {
 
+	// TODO Some of these tests that use a cache should be checked that they
+	// work regardless of the vector passed in as the cache.
+
 	/**
 	 * The delta value to be used in all float/double comparisons.
 	 */

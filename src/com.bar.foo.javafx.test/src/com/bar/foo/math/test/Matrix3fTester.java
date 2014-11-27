@@ -3,7 +3,9 @@ package com.bar.foo.math.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Random;
@@ -729,6 +731,158 @@ public class Matrix3fTester {
 		assertFalse(object.hashCode() == unequalObject.hashCode());
 		assertFalse(equalObject.hashCode() == unequalObject.hashCode());
 		// ------------------------------------------ //
+
+		return;
+	}
+
+	/**
+	 * This tests all multiplication methods provided by {@code Matrix3f}.
+	 */
+	@Test
+	public void checkMultiply() {
+
+		Matrix3f A;
+		Matrix3f B;
+		final Matrix3f AB;
+		final Matrix3f Acopy;
+		Vector3f u;
+		final Vector3f v;
+		Matrix3f cacheMatrix;
+		final Matrix3f nullMatrix = null;
+		Vector3f cacheVector;
+		final Vector3f nullVector = null;
+
+		// Generate random numbers for some of the following tests.
+		// These are for matrix A.
+		final float a00 = random.nextFloat();
+		final float a01 = random.nextFloat();
+		final float a02 = random.nextFloat();
+		final float a10 = random.nextFloat();
+		final float a11 = random.nextFloat();
+		final float a12 = random.nextFloat();
+		final float a20 = random.nextFloat();
+		final float a21 = random.nextFloat();
+		final float a22 = random.nextFloat();
+		A = new Matrix3f(a00, a01, a02, a10, a11, a12, a20, a21, a22);
+		Acopy = new Matrix3f(A);
+		// These are for the vector u.
+		final float u0 = random.nextFloat();
+		final float u1 = random.nextFloat();
+		final float u2 = random.nextFloat();
+		u = new Vector3f(u0, u1, u2);
+		// These are for the vector v = Au.
+		final float v0 = a00 * u0 + a01 * u1 + a02 * u2;
+		final float v1 = a10 * u0 + a11 * u1 + a12 * u2;
+		final float v2 = a20 * u0 + a21 * u1 + a22 * u2;
+		v = new Vector3f(v0, v1, v2);
+		// These are for matrix B.
+		final float b00 = random.nextFloat();
+		final float b01 = random.nextFloat();
+		final float b02 = random.nextFloat();
+		final float b10 = random.nextFloat();
+		final float b11 = random.nextFloat();
+		final float b12 = random.nextFloat();
+		final float b20 = random.nextFloat();
+		final float b21 = random.nextFloat();
+		final float b22 = random.nextFloat();
+		B = new Matrix3f(b00, b01, b02, b10, b11, b12, b20, b21, b22);
+		// These are for the resulting matrix AB.
+		final float ab00 = a00 * b00 + a01 * b10 + a02 * b20;
+		final float ab01 = a00 * b01 + a01 * b11 + a02 * b21;
+		final float ab02 = a00 * b02 + a01 * b12 + a02 * b22;
+		final float ab10 = a10 * b00 + a11 * b10 + a12 * b20;
+		final float ab11 = a10 * b01 + a11 * b11 + a12 * b21;
+		final float ab12 = a10 * b02 + a11 * b12 + a12 * b22;
+		final float ab20 = a20 * b00 + a21 * b10 + a22 * b20;
+		final float ab21 = a20 * b01 + a21 * b11 + a22 * b21;
+		final float ab22 = a20 * b02 + a21 * b12 + a22 * b22;
+		AB = new Matrix3f(ab00, ab01, ab02, ab10, ab11, ab12, ab20, ab21, ab22);
+
+		// ---- Check multiply(Vector3f) and its cache version. ---- //
+		// First, try multiplying the identity matrix with a vector. The end
+		// result should be the same vector.
+
+		// Try the no-cache version. It returns a new vector.
+		cacheVector = Matrix3f.IDENTITY.multiply(u);
+		assertNotSame(u, cacheVector);
+		assertEquals(u, cacheVector);
+		// Try the cache version.
+		assertSame(cacheVector, Matrix3f.IDENTITY.multiply(v, cacheVector));
+		assertEquals(v, cacheVector);
+		// Try the cache version with a null cache. It should create a new one.
+		assertNotSame(cacheVector, Matrix3f.IDENTITY.multiply(v, nullVector));
+		assertEquals(v, Matrix3f.IDENTITY.multiply(v, nullVector));
+
+		// Try multiplying another matrix with a vector. The end result should
+		// be the vector v.
+		// Try the no-cache version.
+		cacheVector = A.multiply(u);
+		assertEquals(v, cacheVector);
+		// Try the cache version.
+		assertSame(cacheVector, A.multiply(u, cacheVector));
+		assertEquals(v, cacheVector);
+		// Try the cache version with a null cache. It should create a new one.
+		assertNotSame(cacheVector, A.multiply(u, nullVector));
+		assertEquals(v, A.multiply(u, nullVector));
+		
+		// Trying either version with a null vector should throw an exception.
+		try {
+			A.multiply(nullVector);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			A.multiply(nullVector, cacheVector);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// --------------------------------------------------------- //
+
+		// ---- Check multiply(Matrix3f) and its cache version. ---- //
+		// First, try multiplying matrix A with the identity matrix. The end
+		// result should be the same matrix A.
+
+		// Try the no-cache version. It returns the updated matrix A.
+		assertSame(A, A.multiply(Matrix3f.IDENTITY));
+		assertEquals(Acopy, A);
+		// Try the cache version with a null cache. It should create a new one.
+		cacheMatrix = A.multiply(Matrix3f.IDENTITY, nullMatrix);
+		assertNotSame(A, cacheMatrix);
+		assertEquals(A, cacheMatrix);
+		// Try the cache version with a non-null cache. It should update it.
+		cacheMatrix.set(Matrix3f.ZERO); // Zero out the matrix.
+		assertNotEquals(A, cacheMatrix);
+		assertSame(cacheMatrix, A.multiply(Matrix3f.IDENTITY, cacheMatrix));
+		assertEquals(A, cacheMatrix);
+		
+		// Try multiplying matrix A with matrix B. The result should be AB.
+		
+		// Try the cache-version first with a null cache.
+		assertNotSame(cacheMatrix, A.multiply(B, nullMatrix));
+		assertEquals(AB, A.multiply(B, nullMatrix));
+		// Try the cache-version with a non-null cache. The cache should == AB.
+		assertSame(cacheMatrix, A.multiply(B, cacheMatrix));
+		assertEquals(AB, cacheMatrix);
+		// Lastly, try the non-cache version. A now equals AB.
+		assertSame(A, A.multiply(B));
+		assertEquals(AB, A);
+		
+		// Trying either version with a null vector should throw an exception.
+		try {
+			A.multiply(nullMatrix);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		try {
+			A.multiply(nullMatrix, cacheMatrix);
+			fail(failurePrefix + "Operation supports null vector argument!");
+		} catch (NullPointerException e) {
+			// Nothing to do.
+		}
+		// --------------------------------------------------------- //
 
 		return;
 	}

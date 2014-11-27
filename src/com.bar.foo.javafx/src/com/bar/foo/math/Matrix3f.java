@@ -45,6 +45,7 @@ public class Matrix3f {
 	 */
 	public static final Matrix3f IDENTITY = new Matrix3f(1f, 0f, 0f, 0f, 1f,
 			0f, 0f, 0f, 1f);
+
 	/**
 	 * First row, first element.
 	 */
@@ -561,19 +562,28 @@ public class Matrix3f {
 	}
 
 	/**
-	 * Multiplies this matrix by the given matrix and stores the result in a
-	 * <i>new {@code Matrix3f}</i>.
+	 * Multiplies this matrix by the given matrix and stores the result in
+	 * <i>this</i> matrix.
 	 * 
 	 * @param matrix
 	 *            The matrix against which to multiply this one.
-	 * @return A new matrix containing the result.
+	 * @return A reference to this matrix.
 	 */
 	public Matrix3f multiply(Matrix3f matrix) {
-		return multiply(matrix, null);
+		return multiply(matrix, this);
 	}
 
+	/**
+	 * Multiplies this matrix by the given matrix and stores the result in the
+	 * <i>cache</i> matrix.
+	 * 
+	 * @param matrix
+	 *            The matrix against which to multiply this one.
+	 * @param cache
+	 *            The matrix in which to store the computed values.
+	 * @return A reference to the cache.
+	 */
 	public Matrix3f multiply(Matrix3f matrix, Matrix3f cache) {
-
 		float p00 = m00 * matrix.m00 + m01 * matrix.m10 + m02 * matrix.m20;
 		float p10 = m10 * matrix.m00 + m11 * matrix.m10 + m12 * matrix.m20;
 		float p20 = m20 * matrix.m00 + m21 * matrix.m10 + m22 * matrix.m20;
@@ -595,16 +605,27 @@ public class Matrix3f {
 	}
 
 	/**
-	 * Multiplies this matrix by the given vector.
+	 * Multiplies this matrix by the given vector and stores the result in a new
+	 * vector.
 	 * 
 	 * @param vector
-	 *            The vector against which to multiply this one.
-	 * @return A new vector containing the result.
+	 *            The vector against which to multiply this matrix.
+	 * @return A <i>new</i> vector containing the result.
 	 */
 	public Vector3f multiply(Vector3f vector) {
 		return multiply(vector, null);
 	}
 
+	/**
+	 * Multiplies this matrix by the given vector and stores the result in the
+	 * <i>cache</i> vector.
+	 * 
+	 * @param vector
+	 *            The vector against which to multiply this matrix.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return A reference to the cache.
+	 */
 	public Vector3f multiply(Vector3f vector, Vector3f cache) {
 		float x = m00 * vector.x + m01 * vector.y + m02 * vector.z;
 		float y = m10 * vector.x + m11 * vector.y + m12 * vector.z;

@@ -493,10 +493,16 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f cross(Vector3f vector, Vector3f cache) {
+		// Compute the values separately in case the cache is this or the
+		// vector. This is necessary because the x, y, and z values are
+		// independent on each other.
+		float cx = y * vector.z - z * vector.y;
+		float cy = z * vector.x - x * vector.z;
+		float cz = x * vector.y - y * vector.x;
 		if (cache != null) {
-			cache.x = y * vector.z - z * vector.y;
-			cache.y = z * vector.x - x * vector.z;
-			cache.z = x * vector.y - y * vector.x;
+			cache.x = cx;
+			cache.y = cy;
+			cache.z = cz;
 		} else {
 			cache = cross(vector);
 		}
