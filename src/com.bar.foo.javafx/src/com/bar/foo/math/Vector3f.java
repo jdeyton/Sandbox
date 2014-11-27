@@ -29,7 +29,7 @@ package com.bar.foo.math;
  * @author Jordan Deyton
  *
  */
-public class Vector3f implements IVector3f {
+public class Vector3f {
 
 	/**
 	 * The x coordinate of the vector.
@@ -159,22 +159,20 @@ public class Vector3f implements IVector3f {
 		return hash * 31 + Float.hashCode(z);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the length of the vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#length()
+	 * @return The length of the vector.
 	 */
-	@Override
 	public float length() {
 		return FloatMath.sqrt(lengthSquared());
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the length (squared) of the vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#lengthSquared()
+	 * @return The length (squared) of the vector.
 	 */
-	@Override
 	public float lengthSquared() {
 		double x2 = x * x;
 		double y2 = y * y;
@@ -182,12 +180,17 @@ public class Vector3f implements IVector3f {
 		return (float) (x2 + y2 + z2);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Sets the vector's coordinates to the supplied values.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#set(float, float, float)
+	 * @param x
+	 *            The new x value.
+	 * @param y
+	 *            The new y value.
+	 * @param z
+	 *            The new z value.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f set(float x, float y, float z) {
 		this.x = x;
 		this.y = y;
@@ -195,12 +198,13 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Sets the vector's coordinates to the supplied vector's coordinates.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#set(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The vector containing the new coordinates.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f set(Vector3f vector) {
 		x = vector.x;
 		y = vector.y;
@@ -208,12 +212,11 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Negates the x, y, and z values of this vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#negate()
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f negate() {
 		x = -x;
 		y = -y;
@@ -221,12 +224,14 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Negates the x, y, and z values of this vector, but stores the resulting
+	 * values in the specified <i>cache</i> vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#negate(com.bar.foo.math.Vector3f)
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f negate(Vector3f cache) {
 		if (cache != null) {
 			cache.x = -x;
@@ -238,12 +243,12 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Normalizes the vector's values. After this operation, the vector will be
+	 * a <i>unit</i> vector (i.e., its length is 1).
 	 * 
-	 * @see com.bar.foo.math.IVector3f#normalize()
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f normalize() {
 		float lengthSquared = lengthSquared();
 		if (lengthSquared != 1f && lengthSquared > 0f) {
@@ -255,12 +260,15 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Normalizes the vector's values, but stores the resulting values in the
+	 * specified <i>cache</i> vector. After this operation, the <i>cache</i>
+	 * vector will be a <i>unit</i> vector (i.e., its length is 1).
 	 * 
-	 * @see com.bar.foo.math.IVector3f#normalize(com.bar.foo.math.Vector3f)
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f normalize(Vector3f cache) {
 		float lengthSquared = lengthSquared();
 		if (lengthSquared != 1f && lengthSquared > 0f) {
@@ -277,12 +285,17 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Adds the specified x, y, and z values to this vector's coordinates.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#add(float, float, float)
+	 * @param x
+	 *            The value added to the vector's x coordinate.
+	 * @param y
+	 *            The value added to the vector's y coordinate.
+	 * @param z
+	 *            The value added to the vector's z coordinate.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f add(float x, float y, float z) {
 		this.x += x;
 		this.y += y;
@@ -290,12 +303,14 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Adds the specified vector's coordinates to this vector's coordinates.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#add(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The vector whose x, y, and z values will be added to this
+	 *            vector's coordinates.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f add(Vector3f vector) {
 		x += vector.x;
 		y += vector.y;
@@ -303,13 +318,20 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Adds the specified x, y, and z values to this vector's coordinates, but
+	 * stores the resulting values in the specified <i>cache</i> vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#add(float, float, float,
-	 * com.bar.foo.math.Vector3f)
+	 * @param x
+	 *            The value added to the vector's x coordinate.
+	 * @param y
+	 *            The value added to the vector's y coordinate.
+	 * @param z
+	 *            The value added to the vector's z coordinate.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f add(float x, float y, float z, Vector3f cache) {
 		if (cache != null) {
 			cache.x = this.x + x;
@@ -321,13 +343,17 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Adds the specified vector's coordinates to this vector's coordinates, but
+	 * stores the resulting values in the specified <i>cache</i> vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#add(com.bar.foo.math.Vector3f,
-	 * com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The vector whose x, y, and z values will be added to this
+	 *            vector's coordinates.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f add(Vector3f vector, Vector3f cache) {
 		if (cache != null) {
 			cache.x = x + vector.x;
@@ -339,12 +365,18 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Subtracts the specified x, y, and z values from this vector's
+	 * coordinates.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#subtract(float, float, float)
+	 * @param x
+	 *            The value subtracted from the vector's x coordinate.
+	 * @param y
+	 *            The value subtracted from the vector's y coordinate.
+	 * @param z
+	 *            The value subtracted from the vector's z coordinate.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f subtract(float x, float y, float z) {
 		this.x -= x;
 		this.y -= y;
@@ -352,12 +384,15 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Subtracts the specified vector's coordinates from this vector's
+	 * coordinates.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#subtract(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The vector whose x, y, and z values will be subtracted from
+	 *            this vector's coordinates.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f subtract(Vector3f vector) {
 		x -= vector.x;
 		y -= vector.y;
@@ -365,13 +400,21 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Subtracts the specified x, y, and z values from this vector's
+	 * coordinates, but stores the resulting values in the specified
+	 * <i>cache</i> vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#subtract(float, float, float,
-	 * com.bar.foo.math.Vector3f)
+	 * @param x
+	 *            The value subtracted from the vector's x coordinate.
+	 * @param y
+	 *            The value subtracted from the vector's y coordinate.
+	 * @param z
+	 *            The value subtracted from the vector's z coordinate.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f subtract(float x, float y, float z, Vector3f cache) {
 		if (cache != null) {
 			cache.x = this.x - x;
@@ -383,13 +426,19 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see com.bar.foo.math.IVector3f#subtract(com.bar.foo.math.Vector3f,
-	 * com.bar.foo.math.Vector3f)
+	 * Subtracts the specified vector's coordinates from this vector's
+	 * coordinates, but stores the resulting values in the specified
+	 * <i>cache</i> vector.
+	 * 
+	 * @param vector
+	 *            The vector whose x, y, and z values will be subtracted from
+	 *            this vector's coordinates.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f subtract(Vector3f vector, Vector3f cache) {
 		if (cache != null) {
 			cache.x = x - vector.x;
@@ -401,12 +450,14 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Multiplies or scales this vector by the scalar argument.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#multiply(float)
+	 * @param scalar
+	 *            The scalar value by which this vector's coordinates are
+	 *            multiplied.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f multiply(float scalar) {
 		x *= scalar;
 		y *= scalar;
@@ -414,12 +465,21 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Multiplies or scales this vector by the scalar arguments. Each axis can
+	 * be scaled uniquely.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#multiply(float, float, float)
+	 * @param xScale
+	 *            The scalar value by which this vector's x coordinate is
+	 *            multiplied.
+	 * @param yScale
+	 *            The scalar value by which this vector's y coordinate is
+	 *            multiplied.
+	 * @param zScale
+	 *            The scalar value by which this vector's z coordinate is
+	 *            multiplied.
+	 * @return A reference to this vector.
 	 */
-	@Override
 	public Vector3f multiply(float xScale, float yScale, float zScale) {
 		x *= xScale;
 		y *= yScale;
@@ -427,13 +487,17 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Multiplies or scales this vector by the scalar argument, but stores the
+	 * resulting values in the specified <i>cache</i> vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#multiply(float,
-	 * com.bar.foo.math.Vector3f)
+	 * @param scalar
+	 *            The scalar value by which this vector's coordinates are
+	 *            multiplied.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f multiply(float scalar, Vector3f cache) {
 		if (cache != null) {
 			cache.x = x * scalar;
@@ -445,13 +509,24 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Multiplies or scales this vector by the scalar arguments, but stores the
+	 * resulting values in the specified <i>cache</i> vector. Each axis can be
+	 * scaled uniquely.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#multiply(float, float, float
-	 * com.bar.foo.math.Vector3f)
+	 * @param xScale
+	 *            The scalar value by which this vector's x coordinate is
+	 *            multiplied.
+	 * @param yScale
+	 *            The scalar value by which this vector's y coordinate is
+	 *            multiplied.
+	 * @param zScale
+	 *            The scalar value by which this vector's z coordinate is
+	 *            multiplied.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The <i>cache</i> vector.
 	 */
-	@Override
 	public Vector3f multiply(float xScale, float yScale, float zScale,
 			Vector3f cache) {
 		if (cache != null) {
@@ -464,33 +539,54 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the dot product between this vector and the supplied vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#dot(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The opposite vector in the dot product.
+	 * @return The scalar dot product value.
 	 */
-	@Override
 	public float dot(Vector3f vector) {
 		return x * vector.x + y * vector.y + z * vector.z;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the cross product between this vector and the supplied vector.
+	 * <b>The returned value is a <i>new</i> {@code Vector3f}!!!</b>
+	 * <p>
+	 * The returned value is the normal (perpendicular vector) for the plane
+	 * formed by two vectors. Note that the normal returned is dependent on the
+	 * order of the vectors and that our system is based on a right-handed
+	 * xyz-coordinate system.
+	 * </p>
 	 * 
-	 * @see com.bar.foo.math.IVector3f#cross(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The opposite vector in the cross product.
+	 * @return The cross product between this vector and the supplied vector.
+	 *         <b>This is a <i>new</i> {@code Vector3f}!!!</b>
+	 * @see #crossLocal(Vector3f)
 	 */
-	@Override
 	public Vector3f cross(Vector3f vector) {
 		return cross(vector, null);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the cross product between this vector and the supplied vector.
+	 * <b>The returned value is the <i>cache</i> {@code Vector3f}!!!</b>
+	 * <p>
+	 * The returned value is the normal (perpendicular vector) for the plane
+	 * formed by two vectors. Note that the normal returned is dependent on the
+	 * order of the vectors and that our system is based on a right-handed
+	 * xyz-coordinate system.
+	 * </p>
 	 * 
-	 * @see com.bar.foo.math.IVector3f#cross(com.bar.foo.math.Vector3f,
-	 * com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The opposite vector in the cross product.
+	 * @param cache
+	 *            The vector in which to store the computed values.
+	 * @return The cross product between this vector and the supplied vector.
+	 *         <b>This is the <i>cache</i> {@code Vector3f}!!!</b>
 	 */
-	@Override
 	public Vector3f cross(Vector3f vector, Vector3f cache) {
 		float cx = y * vector.z - z * vector.y;
 		float cy = z * vector.x - x * vector.z;
@@ -505,12 +601,18 @@ public class Vector3f implements IVector3f {
 		return cache;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the cross product between this vector and the supplied vector.
+	 * <b>The cross product is stored in <i>this</i> {@code Vector3f}!!!</b>.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#crossLocal(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The opposite vector in the cross product.
+	 * @return <b>A reference to <i>this</i> vector.</b>, which is now the cross
+	 *         product between this vector's previous values and the supplied
+	 *         vector.
+	 * 
+	 * @see #cross(Vector3f)
 	 */
-	@Override
 	public Vector3f crossLocal(Vector3f vector) {
 		// This has been shortened to as few operations as possible.
 		float x = y * vector.z - z * vector.y;
@@ -521,23 +623,28 @@ public class Vector3f implements IVector3f {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the distance between this vector and the supplied vector.
 	 * 
-	 * @see com.bar.foo.math.IVector3f#distance(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The other vector whose distance from this one is being
+	 *            calculated.
+	 * @return The distance between this vector and the supplied vector.
 	 */
-	@Override
 	public float distance(Vector3f vector) {
 		return FloatMath.sqrt(distanceSquared(vector));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Computes the distance (squared) between this vector and the supplied
+	 * vector.
 	 * 
-	 * @see
-	 * com.bar.foo.math.IVector3f#distanceSquared(com.bar.foo.math.Vector3f)
+	 * @param vector
+	 *            The other vector whose distance from this one is being
+	 *            calculated.
+	 * @return The distance (squared) between this vector and the supplied
+	 *         vector.
 	 */
-	@Override
 	public float distanceSquared(Vector3f vector) {
 		double distX = x - vector.x;
 		double distY = y - vector.y;
