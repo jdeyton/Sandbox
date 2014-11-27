@@ -481,8 +481,7 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f cross(Vector3f vector) {
-		return new Vector3f(y * vector.z - z * vector.y, z * vector.x - x
-				* vector.z, x * vector.y - y * vector.x);
+		return cross(vector, null);
 	}
 
 	/*
@@ -493,9 +492,6 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f cross(Vector3f vector, Vector3f cache) {
-		// Compute the values separately in case the cache is this or the
-		// vector. This is necessary because the x, y, and z values are
-		// independent on each other.
 		float cx = y * vector.z - z * vector.y;
 		float cy = z * vector.x - x * vector.z;
 		float cz = x * vector.y - y * vector.x;
@@ -504,7 +500,7 @@ public class Vector3f implements IVector3f {
 			cache.y = cy;
 			cache.z = cz;
 		} else {
-			cache = cross(vector);
+			cache = new Vector3f(cx, cy, cz);
 		}
 		return cache;
 	}
@@ -516,6 +512,7 @@ public class Vector3f implements IVector3f {
 	 */
 	@Override
 	public Vector3f crossLocal(Vector3f vector) {
+		// This has been shortened to as few operations as possible.
 		float x = y * vector.z - z * vector.y;
 		float y = z * vector.x - this.x * vector.z;
 		z = this.x * vector.y - this.y * vector.x;

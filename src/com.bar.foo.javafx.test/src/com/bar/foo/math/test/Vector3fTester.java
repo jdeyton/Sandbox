@@ -811,6 +811,10 @@ public class Vector3fTester {
 		assertEquals(distanceSquared, vector.distanceSquared(vector2), delta);
 		assertEquals(distance, vector.distance(vector2), delta);
 
+		// Getting the distance from itself should return zero.
+		assertEquals(0f, vector.distanceSquared(vector), delta);
+		assertEquals(0f, vector.distance(vector), delta);
+		
 		// ---- Check for null pointer exceptions. ---- //
 		// These should only happen when a non-cache vector is passed.
 		try {
@@ -957,6 +961,22 @@ public class Vector3fTester {
 		cache = vector.set(x, y, z).cross(vector2, nullVector);
 		assertEquals(cross, cache);
 		assertNotSame(cache, vector);
+
+		// Make sure re-using either operator with the cache version does not
+		// create bad results.
+		vector.set(x, y, z);
+		vector2.set(x2, y2, z2);
+		assertEquals(cross, vector.cross(vector2, vector));
+		vector.set(x, y, z);
+		vector2.set(x2, y2, z2);
+		assertEquals(cross, vector.cross(vector2, vector2));
+		
+		// Crossing a vector with itself should return 0.
+		vector.set(x, y, z);
+		assertEquals(Vector3f.ZERO, vector.cross(vector));
+		assertEquals(Vector3f.ZERO, vector.cross(vector, vector));
+		vector.set(x, y, z); // Reset it since it will have changed.
+		assertEquals(Vector3f.ZERO, vector.crossLocal(vector));
 
 		// Since both methods take a vector argument, use the cach
 		// ---- Check for null pointer exceptions. ---- //
