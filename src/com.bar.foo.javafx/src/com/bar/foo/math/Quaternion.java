@@ -26,6 +26,9 @@ public class Quaternion {
 	 */
 	public float z;
 
+	public static final Quaternion ZERO = new Quaternion(0f, 0f, 0f, 0f);
+	public static final Quaternion IDENTITY = new Quaternion(1f, 0f, 0f, 0f);
+
 	public Quaternion(float w, float x, float y, float z) {
 		this.w = w;
 		this.x = x;
@@ -52,17 +55,30 @@ public class Quaternion {
 	 * (Euler) axis.
 	 * 
 	 * @param axis
-	 *            The <b><i>unit</i></b> vector representing an Euler axis.
+	 *            The vector representing an Euler axis. If the zero vector, the
+	 *            returned quaternion is the {@link #IDENTITY identity}.
 	 * @param angle
 	 *            The rotation angle.
 	 */
 	public Quaternion(Vector3f axis, float angle) {
-		float halfAngle = 0.5f * angle;
-		float sinHalfAngle = FloatMath.sin(halfAngle);
-		w = FloatMath.cos(halfAngle);
-		x = axis.x * sinHalfAngle;
-		y = axis.y * sinHalfAngle;
-		z = axis.z * sinHalfAngle;
+		// Make sure this isn't a rotation around the origin. If not, normalize
+		// the vector, then compute the rotation quaternion.
+		if (axis.x != 0f || axis.y != 0f || axis.x != 0f) {
+			Vector3f normalizedAxis = axis.normalize(null);
+			float halfAngle = 0.5f * angle;
+			float sinHalfAngle = FloatMath.sin(halfAngle);
+			w = FloatMath.cos(halfAngle);
+			x = normalizedAxis.x * sinHalfAngle;
+			y = normalizedAxis.y * sinHalfAngle;
+			z = normalizedAxis.z * sinHalfAngle;
+		}
+		// If this is rotation about the origin, load the identity quaternion.
+		else {
+			w = IDENTITY.w;
+			x = IDENTITY.x;
+			y = IDENTITY.y;
+			z = IDENTITY.z;
+		}
 	}
 
 	public Quaternion add(float w, float x, float y, float z) {
