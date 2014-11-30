@@ -291,4 +291,54 @@ public class Quaternion {
 		return cache;
 	}
 
+	public Matrix3f fillRotationMatrix(Matrix3f matrix) {
+		if (matrix == null) {
+			matrix = new Matrix3f();
+		}
+
+		float normSquared = normSquared();
+		float norm = FloatMath.sqrt(normSquared);
+
+		// This factor is 2 for normalize quaternions and 2/norm^2 for
+		// non-normalized quaternions.
+		float f = 2f;
+		if (norm != 1f) {
+			if (norm > 0f) {
+				f = 2f / normSquared();
+			} else {
+				w = x = y = z = 0f;
+				f = 0f;
+			}
+		}
+
+		// This calculation comes from
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
+		// and takes advantage of the fact that, for unit (normalized)
+		// quaternion q = (w, x, y, z), 1 = w*w + x*x + y*y + z*z.
+
+		float fx = f * x;
+		float fy = f * y;
+		float fz = f * z;
+		float fwx = fx * w;
+		float fwy = fy * w;
+		float fwz = fz * w;
+		float fxx = fx * x;
+		float fyy = fy * y;
+		float fzz = fz * z;
+		float fxy = fx * y;
+		float fxz = fx * z;
+		float fyz = fy * z;
+
+		matrix.m00 = 1 - (fyy + fzz);
+		matrix.m01 = fxy - fwz;
+		matrix.m02 = fxz + fwy;
+		matrix.m10 = fxy + fwz;
+		matrix.m11 = 1 - (fxx + fzz);
+		matrix.m12 = fyz - fwx;
+		matrix.m20 = fxz - fwy;
+		matrix.m21 = fyz + fwx;
+		matrix.m22 = 1 - (fxx + fyy);
+
+		return matrix;
+	}
 }
