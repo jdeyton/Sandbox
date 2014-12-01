@@ -98,14 +98,14 @@ public class EmbeddedView {
 			@Override
 			public void run(float value, float timePerFrame, KeyEvent event) {
 				cameraNode.transform.translation.subtract(0f, 0f, moveRate);
-				cameraNode.transform.refresh();
+				cameraNode.transform.refresh(false);
 			}
 		});
 		controls.keys.addToggle(KeyCode.S, new KeyToggleAction() {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
 				cameraNode.transform.translation.add(0f, 0f, moveRate);
-				cameraNode.transform.refresh();
+				cameraNode.transform.refresh(false);
 			}
 
 			@Override
@@ -117,7 +117,7 @@ public class EmbeddedView {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
 				cameraNode.transform.translation.subtract(moveRate, 0f, 0f);
-				cameraNode.transform.refresh();
+				cameraNode.transform.refresh(false);
 			}
 
 			@Override
@@ -129,7 +129,7 @@ public class EmbeddedView {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
 				cameraNode.transform.translation.add(moveRate, 0f, 0f);
-				cameraNode.transform.refresh();
+				cameraNode.transform.refresh(false);
 			}
 
 			@Override
@@ -143,8 +143,7 @@ public class EmbeddedView {
 				Quaternion q = new Quaternion(Vector3f.UNIT_Y, (float) (Math.PI / 20.0));
 				q.multiply(cameraNode.transform.rotation);
 				cameraNode.transform.rotation.set(q);
-				cameraNode.transform.recomputeMatrix();
-				cameraNode.transform.refresh();
+				cameraNode.transform.refresh(true);
 			}
 
 			@Override
@@ -158,8 +157,7 @@ public class EmbeddedView {
 				Quaternion q = new Quaternion(Vector3f.UNIT_Y, (float) (Math.PI / -20.0));
 				q.multiply(cameraNode.transform.rotation);
 				cameraNode.transform.rotation.set(q);
-				cameraNode.transform.recomputeMatrix();
-				cameraNode.transform.refresh();
+				cameraNode.transform.refresh(true);
 			}
 
 			@Override
