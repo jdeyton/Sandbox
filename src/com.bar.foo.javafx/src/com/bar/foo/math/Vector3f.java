@@ -282,6 +282,14 @@ public class Vector3f {
 						* inverseLength);
 			}
 		}
+		// TODO Test this logic!!!
+		else if (cache != null) {
+			cache.x = x;
+			cache.y = y;
+			cache.z = z;
+		} else {
+			cache = new Vector3f(x, y, z);
+		}
 		return cache;
 	}
 

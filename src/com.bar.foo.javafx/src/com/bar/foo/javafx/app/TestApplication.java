@@ -24,7 +24,7 @@ public class TestApplication extends Application {
 
 	public TestApplication() {
 		Node root = new Node();
-		root.rx = new Rotate(180); // Flip the scene around the x-axis.
+//		root.rx = new Rotate(180); // Flip the scene around the x-axis.
 		scene = new Scene(root, 0.0, 0.0, true, SceneAntialiasing.BALANCED);
 		scene.setFill(Color.BLACK);
 		this.root = root;

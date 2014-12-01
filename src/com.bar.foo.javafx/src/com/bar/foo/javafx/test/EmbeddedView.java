@@ -28,6 +28,8 @@ import com.bar.foo.javafx.input.KeyToggleAction;
 import com.bar.foo.javafx.input.MouseAnalogAction;
 import com.bar.foo.javafx.input.MouseCode;
 import com.bar.foo.javafx.input.MouseToggleAction;
+import com.bar.foo.math.Quaternion;
+import com.bar.foo.math.Vector3f;
 
 /**
  * @author Jordan Deyton
@@ -68,11 +70,13 @@ public class EmbeddedView {
 		camera = new PerspectiveCamera(true);
 		camera.setNearClip(0.1);
 		camera.setFarClip(10000.0);
-		cameraNode.setTranslateZ(1000.0);
-		camera.setTranslateX(radius * 2.0); // Move the camera to the right.
+//		cameraNode.setTranslateZ(1000.0);
+//		camera.setTranslateX(radius * 2.0); // Move the camera to the right.
+		cameraNode.transform.translation.set((float) (radius * 2.0), 0f, 1000f);
+//		cameraNode.transform.recomputeMatrix();
 		camera.getTransforms().add(new Rotate(180.0, Rotate.X_AXIS));
 		cameraNode.getChildren().add(camera);
-
+		
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.
 			// Normally, you should check Platform.isFxApplicationThread() first
@@ -93,13 +97,15 @@ public class EmbeddedView {
 		controls.keys.addAnalog(KeyCode.W, new KeyAnalogAction() {
 			@Override
 			public void run(float value, float timePerFrame, KeyEvent event) {
-				camera.setTranslateZ(camera.getTranslateZ() - moveRate);
+				cameraNode.transform.translation.subtract(0f, 0f, moveRate);
+				cameraNode.transform.refresh();
 			}
 		});
 		controls.keys.addToggle(KeyCode.S, new KeyToggleAction() {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
-				camera.setTranslateZ(camera.getTranslateZ() + moveRate);
+				cameraNode.transform.translation.add(0f, 0f, moveRate);
+				cameraNode.transform.refresh();
 			}
 
 			@Override
@@ -110,7 +116,8 @@ public class EmbeddedView {
 		controls.keys.addToggle(KeyCode.A, new KeyToggleAction() {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
-				camera.setTranslateX(camera.getTranslateX() - moveRate);
+				cameraNode.transform.translation.subtract(moveRate, 0f, 0f);
+				cameraNode.transform.refresh();
 			}
 
 			@Override
@@ -121,7 +128,38 @@ public class EmbeddedView {
 		controls.keys.addToggle(KeyCode.D, new KeyToggleAction() {
 			@Override
 			public void pressed(float timePerFrame, KeyEvent event) {
-				camera.setTranslateX(camera.getTranslateX() + moveRate);
+				cameraNode.transform.translation.add(moveRate, 0f, 0f);
+				cameraNode.transform.refresh();
+			}
+
+			@Override
+			public void released(float timePerFrame, KeyEvent event) {
+				
+			}
+		});
+		controls.keys.addToggle(KeyCode.Q, new KeyToggleAction() {
+			@Override
+			public void pressed(float timePerFrame, KeyEvent event) {
+				Quaternion q = new Quaternion(Vector3f.UNIT_Y, (float) (Math.PI / 20.0));
+				q.multiply(cameraNode.transform.rotation);
+				cameraNode.transform.rotation.set(q);
+				cameraNode.transform.recomputeMatrix();
+				cameraNode.transform.refresh();
+			}
+
+			@Override
+			public void released(float timePerFrame, KeyEvent event) {
+				
+			}
+		});
+		controls.keys.addToggle(KeyCode.E, new KeyToggleAction() {
+			@Override
+			public void pressed(float timePerFrame, KeyEvent event) {
+				Quaternion q = new Quaternion(Vector3f.UNIT_Y, (float) (Math.PI / -20.0));
+				q.multiply(cameraNode.transform.rotation);
+				cameraNode.transform.rotation.set(q);
+				cameraNode.transform.recomputeMatrix();
+				cameraNode.transform.refresh();
 			}
 
 			@Override

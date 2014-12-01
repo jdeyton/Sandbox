@@ -81,6 +81,30 @@ public class Quaternion {
 		}
 	}
 
+	public Quaternion set(float w, float x, float y, float z) {
+		this.w = w;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		return this;
+	}
+	
+	public Quaternion set(float w, Vector3f vector) {
+		this.w = w;
+		x = vector.x;
+		y = vector.y;
+		z = vector.z;
+		return this;
+	}
+	
+	public Quaternion set(Quaternion q) {
+		w = q.w;
+		x = q.x;
+		y = q.y;
+		z = q.z;
+		return this;
+	}
+	
 	public Quaternion add(float w, float x, float y, float z) {
 		return add(w, x, y, z, this);
 	}
@@ -221,6 +245,13 @@ public class Quaternion {
 				cache = new Quaternion(w * inverseLength, x * inverseLength, y
 						* inverseLength, z * inverseLength);
 			}
+		} else if (cache != null) {
+			cache.w = w;
+			cache.x = x;
+			cache.y = y;
+			cache.z = z;
+		} else {
+			cache = new Quaternion(w, x, y, z);
 		}
 		return cache;
 	}
