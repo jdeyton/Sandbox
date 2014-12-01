@@ -8,6 +8,19 @@ import com.bar.foo.math.Vector3f;
 import com.sun.javafx.geom.transform.Affine3D;
 import com.sun.javafx.geom.transform.BaseTransform;
 
+/**
+ * This class provides a general 3D transformation that, instead of relying on
+ * the JavaFX transform classes, wraps our custom math library to construct a
+ * combined transformation matrix for scale, rotation, and translation.
+ * <p>
+ * To change the transformation, modify the {@link #scale}, {@link #rotation},
+ * and/or {@link #translation}, then call {@link #refresh(boolean)} to ensure
+ * the changes are applied to the underlying rendering engine.
+ * </p>
+ * 
+ * @author Jordan Deyton
+ *
+ */
 public class GeneralTransform extends Transform {
 
 	/**
@@ -40,6 +53,14 @@ public class GeneralTransform extends Transform {
 	 */
 	private final Matrix3f transformMatrix = new Matrix3f(Matrix3f.IDENTITY);
 
+	/**
+	 * Applies any changes with the transformation to the underlying rendering
+	 * system.
+	 * 
+	 * @param scaledOrRotated
+	 *            Whether or not the scale or rotation has been changed. If
+	 *            true, the transformation matrix will need to be recomputed.
+	 */
 	public void refresh(boolean scaledOrRotated) {
 		// If the scale or rotation has changed, recompute the 3x3
 		// transformation matrix.
@@ -77,6 +98,12 @@ public class GeneralTransform extends Transform {
 	}
 
 	// ---- Transformation matrix getters from class Transform ---- //
+	// TODO We may also be able to override the transform methods (e.g.,
+	// transformPoint3D) instead of using the transformation matrix. The number
+	// of mathematical operations from computing the transformation
+	// matrix/multiplying it by points will need to be compared with directly
+	// applying the scale, rotation, and translation to the point.
+
 	/*
 	 * (non-Javadoc)
 	 * 
