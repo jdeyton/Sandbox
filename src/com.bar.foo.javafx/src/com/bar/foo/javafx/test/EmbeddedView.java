@@ -21,13 +21,10 @@ import org.eclipse.swt.widgets.Composite;
 import com.bar.foo.javafx.Node;
 import com.bar.foo.javafx.camera.FlyCamera;
 import com.bar.foo.javafx.input.ControlManager;
-import com.bar.foo.javafx.input.KeyAnalogAction;
 import com.bar.foo.javafx.input.KeyToggleAction;
 import com.bar.foo.javafx.input.MouseAnalogAction;
 import com.bar.foo.javafx.input.MouseCode;
 import com.bar.foo.javafx.input.MouseToggleAction;
-import com.bar.foo.math.Quaternion;
-import com.bar.foo.math.Vector3f;
 
 /**
  * @author Jordan Deyton
@@ -62,6 +59,7 @@ public class EmbeddedView {
 
 		// Set up the view camera.
 		camera = new FlyCamera();
+		camera.registerControls(controls);
 		// Add the camera to the root node so it can move.
 		root.getChildren().add(camera);
 		// Move the camera out towards the user and to the right.
@@ -78,85 +76,6 @@ public class EmbeddedView {
 				}
 			});
 		}
-
-		final float moveRate = 10f;
-
-		// Add listeners to move the camera a little bit.
-		// W is registered as an analog listener. The others are registered as
-		// action listeners.
-		controls.keys.addAnalog(KeyCode.W, new KeyAnalogAction() {
-			@Override
-			public void run(float value, float timePerFrame, KeyEvent event) {
-				camera.transform.translation.subtract(0f, 0f, moveRate);
-				camera.transform.refresh(false);
-			}
-		});
-		controls.keys.addToggle(KeyCode.S, new KeyToggleAction() {
-			@Override
-			public void pressed(float timePerFrame, KeyEvent event) {
-				camera.transform.translation.add(0f, 0f, moveRate);
-				camera.transform.refresh(false);
-			}
-
-			@Override
-			public void released(float timePerFrame, KeyEvent event) {
-
-			}
-		});
-		controls.keys.addToggle(KeyCode.A, new KeyToggleAction() {
-			@Override
-			public void pressed(float timePerFrame, KeyEvent event) {
-				camera.transform.translation.subtract(moveRate, 0f, 0f);
-				camera.transform.refresh(false);
-			}
-
-			@Override
-			public void released(float timePerFrame, KeyEvent event) {
-
-			}
-		});
-		controls.keys.addToggle(KeyCode.D, new KeyToggleAction() {
-			@Override
-			public void pressed(float timePerFrame, KeyEvent event) {
-				camera.transform.translation.add(moveRate, 0f, 0f);
-				camera.transform.refresh(false);
-			}
-
-			@Override
-			public void released(float timePerFrame, KeyEvent event) {
-
-			}
-		});
-		controls.keys.addToggle(KeyCode.Q, new KeyToggleAction() {
-			@Override
-			public void pressed(float timePerFrame, KeyEvent event) {
-				Quaternion q = new Quaternion(Vector3f.UNIT_Y,
-						(float) (Math.PI / 20.0));
-				q.multiply(camera.transform.rotation);
-				camera.transform.rotation.set(q);
-				camera.transform.refresh(true);
-			}
-
-			@Override
-			public void released(float timePerFrame, KeyEvent event) {
-
-			}
-		});
-		controls.keys.addToggle(KeyCode.E, new KeyToggleAction() {
-			@Override
-			public void pressed(float timePerFrame, KeyEvent event) {
-				Quaternion q = new Quaternion(Vector3f.UNIT_Y,
-						(float) (Math.PI / -20.0));
-				q.multiply(camera.transform.rotation);
-				camera.transform.rotation.set(q);
-				camera.transform.refresh(true);
-			}
-
-			@Override
-			public void released(float timePerFrame, KeyEvent event) {
-
-			}
-		});
 
 		// Add a listener for the space key.
 		controls.keys.addToggle(KeyCode.SPACE, new KeyToggleAction() {

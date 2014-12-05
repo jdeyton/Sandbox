@@ -12,16 +12,45 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 
 /**
+ * An {@code ActionHandler} manages multiple {@link AnalogAction}s and
+ * {@link ToggleAction}s for a particular key and event type.
+ * <p>
+ * Multiple actions can be triggered by a single event if they are keyed on the
+ * same trigger.
+ * </p>
+ * <p>
+ * This class was created to reduce code inside the {@link ControlManager}.
+ * Specifically, the {@code ControlManager} leverages two instances of this
+ * class, one each for key and mouse events. This frees the manager from
+ * maintaining its own maps of {@code AnalogAction}s and {@code ToggleAction}s
+ * and from having to handle events directly.
+ * <p>
+ * 
  * @author Jordan Deyton
  *
+ * @param <K>
+ *            The key or "trigger" type, e.g. KeyCode.
+ * @param <T>
+ *            The event type, e.g., KeyEvent. Multiple event types can be
+ *            assigned to the same trigger.
  */
 public abstract class ActionHandler<K, T extends Event> implements
 		EventHandler<T> {
 
+	/**
+	 * The map of {@code AnalogAction}s.
+	 */
 	private final Map<K, List<AnalogAction<T>>> analogMap;
+	/**
+	 * The map of {@code ToggleAction}s.
+	 */
 	private final Map<K, List<ToggleAction<T>>> toggleMap;
 
+	/**
+	 * The default constructor.
+	 */
 	public ActionHandler() {
+		// Initialize the maps here to prevent ugly code formatting.
 		analogMap = new HashMap<K, List<AnalogAction<T>>>();
 		toggleMap = new HashMap<K, List<ToggleAction<T>>>();
 	}
