@@ -15,11 +15,20 @@ import com.bar.foo.javafx.input.ControlManager;
 import com.bar.foo.javafx.input.IControlContributor;
 import com.bar.foo.javafx.input.KeyAnalogAction;
 import com.bar.foo.javafx.input.KeyToggleAction;
+import com.bar.foo.math.FloatMath;
+import com.bar.foo.math.Matrix3f;
 import com.bar.foo.math.Quaternion;
 import com.bar.foo.math.Vector3f;
 
 /**
- * TODO Document this class.
+ * This class provides a "flying" camera that includes setters used to imitate,
+ * roughly, flying in an aircraft. Additional functionality includes the ability
+ * to "strafe" (move horizontally left or right), raise, or lower the camera.
+ * When clicking and dragging with the mouse, the view rotates as if you are
+ * moving your head in the cockpit.
+ * <p>
+ * This class extends {@link Node} and wraps a JavaFX {@link PerspectiveCamera}.
+ * </p>
  * 
  * @author Jordan Deyton
  *
@@ -42,7 +51,51 @@ public class FlyCamera extends Node implements IControlContributor {
 
 	private ControlManager controls = null;
 
-	private static final float moveRate = 10f;
+	/**
+	 * The rate at which the camera moves forward, backward, and sideways.
+	 */
+	private float moveRate = 10f;
+	/**
+	 * The rate at which the camera rolls and rotates up, down, and sideways.
+	 */
+	private float rotateRate = 10f;
+	/**
+	 * The rate at which the camera zooms.
+	 */
+	private float zoomRate = 10f;
+
+	/**
+	 * The current position or location of the camera.
+	 */
+	private final Vector3f position = new Vector3f(0f, 0f, 1000f);
+
+	/**
+	 * The current direction in which the camera points.
+	 */
+	private final Vector3f dir = new Vector3f(Vector3f.UNIT_Z).negate();
+	/**
+	 * The current up axis for the camera. This must be orthogonal to
+	 * {@link #dir}.
+	 */
+	private final Vector3f up = new Vector3f(Vector3f.UNIT_Y);
+	/**
+	 * The current right axis for the camera. This must be normal to
+	 * {@link #dir} and {@link #up}. To compute it from the direction and up
+	 * vectors, use direction cross up (assuming we have a right-handed
+	 * coordinate system).
+	 */
+	private final Vector3f right = new Vector3f(Vector3f.UNIT_X);
+
+	/**
+	 * The current up axis for the camera. This is used only when dragging the
+	 * mouse so that changes in pitch combined with changes in yaw do not
+	 * effectively roll the camera.
+	 */
+	private final Vector3f dragUp = new Vector3f(up);
+	/**
+	 * Whether or not the camera's rotation is controlled by dragging the mouse.
+	 */
+	private boolean dragging = false;
 	
 	/**
 	 * The default constructor.
@@ -112,9 +165,10 @@ public class FlyCamera extends Node implements IControlContributor {
 			// Update the reference to the registered ControlManager.
 			controls = controlManager;
 			// TODO Add all key, mouse, and/or joystick controls.
-			
+
 			// Add listeners to move the camera a little bit.
-			// W is registered as an analog listener. The others are registered as
+			// W is registered as an analog listener. The others are registered
+			// as
 			// action listeners.
 			controls.keys.addAnalog(KeyCode.W, new KeyAnalogAction() {
 				@Override
@@ -210,6 +264,282 @@ public class FlyCamera extends Node implements IControlContributor {
 		}
 		return unregistered;
 	}
+
 	// ---------------------------------------- //
 
+	// ---- Configuration Getters/Setters ---- //
+	/**
+	 * Sets the rate at which the camera moves. The default value is
+	 * <code>3.0</code>.
+	 * 
+	 * @param moveRate
+	 *            The new move rate. This should not be negative.
+	 */
+	public void setMoveRate(float moveRate) {
+		if (moveRate > 0f) {
+			this.moveRate = moveRate;
+		}
+	}
+
+	/**
+	 * Sets the rate at which the camera rotates. The default value is
+	 * <code>1.0</code>.
+	 * 
+	 * @param rotateRate
+	 *            The new rotation rate. This should not be negative.
+	 */
+	public void setRotationRate(float rotateRate) {
+		if (rotateRate > 0f) {
+			this.rotateRate = rotateRate;
+		}
+	}
+
+	/**
+	 * Sets the rate at which the camera zooms. The default value is
+	 * <code>1.0</code>.
+	 * 
+	 * @param zoomRate
+	 *            The new zoom rate. This should not be negative.
+	 */
+	public void setZoomRate(float zoomRate) {
+		if (zoomRate > 0f) {
+			this.zoomRate = zoomRate;
+		}
+	}
+	// --------------------------------------- //
+
+	// ---- Non-incremental Setters ---- //
+	/**
+	 * Sets the position of the camera at once, as opposed to incremental
+	 * positioning.
+	 * 
+	 * @param position
+	 *            The new position. If null, an exception is thrown.
+	 * 
+	 * @see #thrustCamera(float)
+	 * @see #strafeCamera(float)
+	 * @see #raiseCamera(float)
+	 */
+	public void setPosition(Vector3f position) {
+		// Check for nulls first.
+		if (position == null) {
+			throw new IllegalArgumentException("FlyCamera error: "
+					+ "Null arguments not accepted for positioning the camera.");
+		}
+
+		// Update the local position and the camera.
+		transform.translation.set(this.position.set(position));
+
+		return;
+	}
+
+	/**
+	 * Sets the orientation of the camera at once, as opposed to incremental
+	 * orientation.
+	 * 
+	 * @param direction
+	 *            The new direction in which the camera will point. If null, an
+	 *            exception is thrown.
+	 * @param up
+	 *            The new up direction. If null or if it is not orthogonal to
+	 *            the camera direction, an exception is thrown.
+	 * 
+	 * @see #rollCamera(float)
+	 * @see #pitchCamera(float)
+	 * @see #yawCamera(float)
+	 */
+	public void setOrientation(Vector3f direction, Vector3f up) {
+		// Check for nulls first.
+		if (direction == null || up == null) {
+			throw new IllegalArgumentException("FlightCamera error: "
+					+ "Null arguments not accepted for orienting the camera.");
+		}
+		// Make sure the direction and up vectors are orthogonal.
+		else if (Math.abs(direction.dot(up)) > 1e-5f || direction.equals(up)
+				|| Vector3f.ZERO.equals(direction) || Vector3f.ZERO.equals(up)) {
+			throw new IllegalArgumentException("FlightCamera error: "
+					+ "Direction and up vector are not orthogonal.");
+		}
+		
+		// Update the local orientation vectors. Since this is a right-handed
+		// system, get the right vector by crossing direction with up.
+		direction.normalize(this.dir);
+		up.normalize(this.up);
+		this.dir.cross(up, this.right).normalize();
+		
+		// We also need to set the up vector for dragging, otherwise trying to
+		// drag to rotate will use the old dragUp vector for yaw rotation.
+		dragUp.set(this.up);
+
+		// Update the rotation part of the transform.
+		Matrix3f matrix = new Matrix3f(this.dir, this.up, this.right);
+		
+		return;
+	}
+
+	// --------------------------------- //
+	
+	// ---- Incremental Setters ---- //
+	/**
+	 * Zooms the camera in or out.
+	 * 
+	 * @param value
+	 *            The amount by which to zoom in or out. Negative zooms in,
+	 *            positive zooms out.
+	 */
+	public void zoomCamera(float value) {
+		System.out.println("zoomCamera(" + value + ")");
+		// // This method comes straight from FlyByCamera.
+		//
+		// // derive fovY value
+		// float h = camera.getFrustumTop();
+		// float w = camera.getFrustumRight();
+		// float aspect = w / h;
+		//
+		// float near = camera.getFrustumNear();
+		//
+		// float fovY = FastMath.atan(h / near) / (FastMath.DEG_TO_RAD * .5f);
+		// float newFovY = fovY + value * 0.1f * zoomSpeed;
+		// if (newFovY > 0f) {
+		// // Don't let the FOV go zero or negative.
+		// fovY = newFovY;
+		// }
+		//
+		// h = FastMath.tan(fovY * FastMath.DEG_TO_RAD * .5f) * near;
+		// w = h * aspect;
+		//
+		// camera.setFrustumTop(h);
+		// camera.setFrustumBottom(-h);
+		// camera.setFrustumLeft(-w);
+		// camera.setFrustumRight(w);
+		//
+		// return;
+	}
+
+	/**
+	 * Moves the camera forward or backward.
+	 * 
+	 * @param distance
+	 *            If positive, the camera moves forward. If negative, the camera
+	 *            moves backward.
+	 */
+	public void thrustCamera(float distance) {
+		System.out.println("thrustCamera(" + distance + ")");
+		// Vector3f velocity = dir.mult(distance);
+		// camera.setLocation(position.addLocal(velocity));
+	}
+
+	/**
+	 * Moves the camera right or left.
+	 * 
+	 * @param distance
+	 *            If positive, the camera moves right. If negative, the camera
+	 *            moves left.
+	 */
+	public void strafeCamera(float distance) {
+		System.out.println("strafeCamera(" + distance + ")");
+		// Vector3f velocity = left.mult(distance);
+		// // We have to subtract because we're using the left direction! Right
+		// // should be positive.
+		// camera.setLocation(position.subtractLocal(velocity));
+	}
+
+	/**
+	 * Moves the camera up or down.
+	 * 
+	 * @param distance
+	 *            If positive, the camera moves up. If negative, the camera
+	 *            moves down.
+	 */
+	public void raiseCamera(float distance) {
+		System.out.println("raiseCamera(" + distance + ")");
+		// Vector3f velocity = up.mult(distance);
+		// camera.setLocation(position.addLocal(velocity));
+	}
+
+	/**
+	 * Rotates (rolls) the camera right or left.
+	 * 
+	 * @param radians
+	 *            If positive, the camera rolls right. If negative, the camera
+	 *            rolls left.
+	 */
+	public void rollCamera(float radians) {
+		System.out.println("rollCamera(" + radians + ")");
+		// rotateCamera(radians, dir);
+		// // When not dragging, we should update the up vector that is used
+		// // when dragging with the mouse. Note: The camera cannot be rolled
+		// when
+		// // dragging!
+		// dragUp.set(up);
+	}
+
+	/**
+	 * Changes the pitch of the camera (rotates up and down).
+	 * 
+	 * @param radians
+	 *            If positive, the camera pitches up. If negative, the camera
+	 *            pitches down.
+	 */
+	public void pitchCamera(float radians) {
+		System.out.println("pitchCamera(" + radians + ")");
+		// rotateCamera(-radians, left);
+		// if (!dragging) {
+		// // When not dragging, we should update the up vector that is used
+		// // when dragging with the mouse.
+		// dragUp.set(up);
+		// }
+	}
+
+	/**
+	 * Changes the yaw of the camera right or left.
+	 * 
+	 * @param radians
+	 *            If positive, the camera rotates right. If negative, the camera
+	 *            rotates left.
+	 */
+	public void yawCamera(float radians) {
+		System.out.println("yawCamera(" + radians + ")");
+		// // If the mouse is controlling yaw, use the up vector for dragging.
+		// if (dragging) {
+		// rotateCamera(-radians, dragUp);
+		// } else {
+		// rotateCamera(-radians, up);
+		// // When not dragging, we should update the up vector that is used
+		// // when dragging with the mouse.
+		// dragUp.set(up);
+		// }
+	}
+
+	/**
+	 * Rotates the camera based on the provided angle and axis. {@link #up},
+	 * {@link #left}, and {@link #dir} are all updated in this method.
+	 * 
+	 * @param radians
+	 *            The angle to rotate.
+	 * @param axis
+	 *            The axis to rotate around.
+	 */
+	private void rotateCamera(float radians, Vector3f axis) {
+		System.out.println("rotateCamera(" + radians + ", " + axis + ")");
+		// Matrix3f matrix = new Matrix3f();
+		// matrix.fromAngleNormalAxis(radians, axis);
+		//
+		// // TODO We can probably shorten the number of calculations required
+		// by
+		// // tailoring the rotations for pitch, yaw, and roll. (The matrix
+		// should
+		// // always be roughly the same for each case.)
+		//
+		// // Apply the overall rotation to the direction vectors. Note that we
+		// do
+		// // not update the dragUp vector, since it should not be updated when
+		// // using the mouse drag to rotate.
+		// matrix.multLocal(up).normalizeLocal();
+		// matrix.multLocal(left).normalizeLocal();
+		// matrix.multLocal(dir).normalizeLocal();
+		//
+		// camera.setAxes(left, up, dir);
+	}
+	// ----------------------------- //
 }

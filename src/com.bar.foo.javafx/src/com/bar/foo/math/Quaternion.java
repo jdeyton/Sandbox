@@ -80,6 +80,16 @@ public class Quaternion {
 			z = IDENTITY.z;
 		}
 	}
+	
+	public Quaternion(Matrix3f rotation) {
+		// which is bigger? w, x, y, or z?
+		// w = 1/2 * sqrt(1 + m00 + m11 + m22)
+		// x = 1/2 * sqrt(1 + m00 - m11 - m22)
+		// y = 1/2 * sqrt(1 - m00 + m11 - m22)
+		// z = 1/2 * sqrt(1 - m00 - m11 + m22)
+		
+		
+	}
 
 	public Quaternion set(float w, float x, float y, float z) {
 		this.w = w;

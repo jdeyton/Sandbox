@@ -25,6 +25,7 @@ import com.bar.foo.javafx.input.KeyToggleAction;
 import com.bar.foo.javafx.input.MouseAnalogAction;
 import com.bar.foo.javafx.input.MouseCode;
 import com.bar.foo.javafx.input.MouseToggleAction;
+import com.bar.foo.math.Vector3f;
 
 /**
  * @author Jordan Deyton
@@ -63,7 +64,8 @@ public class EmbeddedView {
 		// Add the camera to the root node so it can move.
 		root.getChildren().add(camera);
 		// Move the camera out towards the user and to the right.
-		camera.transform.translation.set((float) (radius * 2.0), 0f, 1000f);
+		camera.setPosition(new Vector3f((float) (radius * 2.0), 0f, 1000f));
+		camera.setOrientation(new Vector3f(-0.25f, 0f, -1f).normalize(), Vector3f.UNIT_Y);
 
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.

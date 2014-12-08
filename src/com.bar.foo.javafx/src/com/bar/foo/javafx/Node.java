@@ -14,7 +14,7 @@ public class Node extends Group {
 
 	// TODO Change this to private and expose it via setters for scaling,
 	// rotating, and translating.
-	public final GeneralTransform transform = new GeneralTransform();
+	protected final GeneralTransform transform = new GeneralTransform();
 	
 	public Node() {
 		super();
