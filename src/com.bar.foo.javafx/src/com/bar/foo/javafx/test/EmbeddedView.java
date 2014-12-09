@@ -51,9 +51,10 @@ public class EmbeddedView {
 		// Create a box with the specifications and add it to the root node.
 		Box box = new Box(radius, radius, radius);
 		PhongMaterial material = new PhongMaterial(color);
-		material.setSpecularColor(Color.WHITE);
+		material.setSpecularColor(Color.RED);
 		box.setMaterial(material);
 		int count = MultiViewLauncher.count;
+		System.out.println("Adding box " + count);
 		box.getTransforms().add(
 				new Translate(radius * count, radius * count, radius * count));
 		root.getChildren().add(box);
@@ -64,8 +65,8 @@ public class EmbeddedView {
 		// Add the camera to the root node so it can move.
 		root.getChildren().add(camera);
 		// Move the camera out towards the user and to the right.
-		camera.setPosition(new Vector3f((float) (radius * 2.0), 0f, 1000f));
-		camera.setOrientation(new Vector3f(-0.25f, 0f, -1f).normalize(), Vector3f.UNIT_Y);
+//		camera.setPosition(new Vector3f(0f, 0f, 1000f));
+//		camera.setOrientation(new Vector3f(0f, 0f, -1f), Vector3f.UNIT_Y);
 
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.

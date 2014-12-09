@@ -64,27 +64,31 @@ public class FlyCamera extends Node implements IControlContributor {
 	 */
 	private float zoomRate = 10f;
 
+	private final Vector3f defaultDir = new Vector3f(0f, 0f, -1f);
+	private final Vector3f defaultUp = new Vector3f(0f, 1f, 0f);
+	private final Vector3f defaultRight = new Vector3f(1f, 0f, 0f);
+	
 	/**
 	 * The current position or location of the camera.
 	 */
-	private final Vector3f position = new Vector3f(0f, 0f, 1000f);
+	private final Vector3f position = new Vector3f();
 
 	/**
 	 * The current direction in which the camera points.
 	 */
-	private final Vector3f dir = new Vector3f(Vector3f.UNIT_Z).negate();
+	private final Vector3f dir = new Vector3f(defaultDir);
 	/**
 	 * The current up axis for the camera. This must be orthogonal to
 	 * {@link #dir}.
 	 */
-	private final Vector3f up = new Vector3f(Vector3f.UNIT_Y);
+	private final Vector3f up = new Vector3f(defaultUp);
 	/**
 	 * The current right axis for the camera. This must be normal to
 	 * {@link #dir} and {@link #up}. To compute it from the direction and up
 	 * vectors, use direction cross up (assuming we have a right-handed
 	 * coordinate system).
 	 */
-	private final Vector3f right = new Vector3f(Vector3f.UNIT_X);
+	private final Vector3f right = new Vector3f(defaultRight);
 
 	/**
 	 * The current up axis for the camera. This is used only when dragging the
@@ -117,6 +121,9 @@ public class FlyCamera extends Node implements IControlContributor {
 		// Attach the PerspectiveCamera to this Node (Group).
 		getChildren().add(camera);
 
+		setPosition(new Vector3f(1000f, 0f, 1000f));
+		setOrientation(new Vector3f(-1f, 0f, -1f), new Vector3f(0f, 1f, 0f));
+		
 		return;
 	}
 
@@ -216,8 +223,8 @@ public class FlyCamera extends Node implements IControlContributor {
 			controls.keys.addToggle(KeyCode.Q, new KeyToggleAction() {
 				@Override
 				public void pressed(float timePerFrame, KeyEvent event) {
-					Quaternion q = new Quaternion(Vector3f.UNIT_Y,
-							(float) (Math.PI / 20.0));
+					Quaternion q = Quaternion.fromUnitAxisAngle(Vector3f.UNIT_Y,
+							(float) (Math.PI / 20.0), null);
 					q.multiply(transform.rotation);
 					transform.rotation.set(q);
 					transform.refresh(true);
@@ -231,8 +238,8 @@ public class FlyCamera extends Node implements IControlContributor {
 			controls.keys.addToggle(KeyCode.E, new KeyToggleAction() {
 				@Override
 				public void pressed(float timePerFrame, KeyEvent event) {
-					Quaternion q = new Quaternion(Vector3f.UNIT_Y,
-							(float) (Math.PI / -20.0));
+					Quaternion q = Quaternion.fromAxisAngle(Vector3f.UNIT_Y,
+							(float) (Math.PI / -20.0), null);
 					q.multiply(transform.rotation);
 					transform.rotation.set(q);
 					transform.refresh(true);
@@ -361,18 +368,31 @@ public class FlyCamera extends Node implements IControlContributor {
 					+ "Direction and up vector are not orthogonal.");
 		}
 		
-		// Update the local orientation vectors. Since this is a right-handed
-		// system, get the right vector by crossing direction with up.
-		direction.normalize(this.dir);
-		up.normalize(this.up);
-		this.dir.cross(up, this.right).normalize();
-		
-		// We also need to set the up vector for dragging, otherwise trying to
-		// drag to rotate will use the old dragUp vector for yaw rotation.
-		dragUp.set(this.up);
+//		// Update the local orientation vectors. Since this is a right-handed
+//		// system, get the right vector by crossing direction with up.
+//		direction.normalize(this.dir);
+//		up.normalize(this.up);
+////		this.dir.cross(up, this.right).normalize();
+//		this.up.cross(this.dir, this.left).normalize();
+//
+//		// We also need to set the up vector for dragging, otherwise trying to
+//		// drag to rotate will use the old dragUp vector for yaw rotation.
+//		dragUp.set(this.up);
+//
+//		// Update the rotation part of the transform.
+//		Matrix3f matrix = new Matrix3f(this.left, this.up, this.dir);
+//		Quaternion q = new Quaternion(matrix);
+//		transform.rotation.set(q);
+//		transform.refresh(true);
 
-		// Update the rotation part of the transform.
-		Matrix3f matrix = new Matrix3f(this.dir, this.up, this.right);
+//		// Now we have the new dir, up, and right vectors, all normalized.
+//		Vector3f right = direction.normalize().cross(up.normalize())
+//				.normalize();
+
+		Quaternion q = Quaternion.fromTwoVectors(defaultDir,
+				direction.normalize());
+		transform.rotation.set(q);
+		transform.refresh(true);
 		
 		return;
 	}

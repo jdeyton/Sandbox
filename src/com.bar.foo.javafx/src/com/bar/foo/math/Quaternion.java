@@ -29,6 +29,11 @@ public class Quaternion {
 	public static final Quaternion ZERO = new Quaternion(0f, 0f, 0f, 0f);
 	public static final Quaternion IDENTITY = new Quaternion(1f, 0f, 0f, 0f);
 
+	public Quaternion() {
+		w = 1f;
+		x = y = z = 0f;
+	}
+
 	public Quaternion(float w, float x, float y, float z) {
 		this.w = w;
 		this.x = x;
@@ -50,94 +55,6 @@ public class Quaternion {
 		z = quaternion.z;
 	}
 
-	/**
-	 * Constructs a quaternion representing the rotation by angle around a fixed
-	 * (Euler) axis.
-	 * 
-	 * @param axis
-	 *            The vector representing an Euler axis. If the zero vector, the
-	 *            returned quaternion is the {@link #IDENTITY identity}.
-	 * @param angle
-	 *            The rotation angle.
-	 */
-	public Quaternion(Vector3f axis, float angle) {
-		// Make sure this isn't a rotation around the origin. If not, normalize
-		// the vector, then compute the rotation quaternion.
-		if (axis.x != 0f || axis.y != 0f || axis.x != 0f) {
-			Vector3f normalizedAxis = axis.normalize(null);
-			float halfAngle = 0.5f * angle;
-			float sinHalfAngle = FloatMath.sin(halfAngle);
-			w = FloatMath.cos(halfAngle);
-			x = normalizedAxis.x * sinHalfAngle;
-			y = normalizedAxis.y * sinHalfAngle;
-			z = normalizedAxis.z * sinHalfAngle;
-		}
-		// If this is rotation about the origin, load the identity quaternion.
-		else {
-			w = IDENTITY.w;
-			x = IDENTITY.x;
-			y = IDENTITY.y;
-			z = IDENTITY.z;
-		}
-	}
-	
-	public Quaternion(Matrix3f rotation) {
-		// This is based off the algebra performed in
-		// http://www.ee.ucr.edu/~farrell/AidedNavigation/D_App_Quaternions/Rot2Quat.pdf
-
-		// To minimize the chance of dividing by zero, we compute the list of
-		// possible divisors and pick the largest non-zero value.
-
-		// We have four possible divisors for determining the quaternion from
-		// the rotation matrix. We should use the greatest divisor furthest from
-		// 0! Note that all values are positive.
-		float wD = Math.abs(1f + rotation.m00 + rotation.m11 + rotation.m22);
-		float xD = Math.abs(1f + rotation.m00 - rotation.m11 - rotation.m22);
-		float yD = Math.abs(1f - rotation.m00 + rotation.m11 - rotation.m22);
-		float zD = Math.abs(1f - rotation.m00 - rotation.m11 + rotation.m22);
-
-		// See if the w divisor is the greatest.
-		if (wD > xD && wD > yD && wD > zD) {
-			wD = FloatMath.sqrt(wD);
-			w = 0.5f * wD;
-			wD = 0.5f / wD;
-			x = (rotation.m21 - rotation.m12) * wD;
-			y = (rotation.m02 - rotation.m20) * wD;
-			z = (rotation.m10 - rotation.m01) * wD;
-		}
-		// See if the x divisor is the greatest. We have ruled out w.
-		else if (xD > yD && xD > zD) {
-			xD = FloatMath.sqrt(xD);
-			x = 0.5f * xD;
-			xD = 0.5f / xD;
-			w = (rotation.m21 - rotation.m12) * xD;
-			y = (rotation.m01 + rotation.m10) * xD;
-			z = (rotation.m02 + rotation.m20) * xD;
-		}
-		// See if the y divisor is the greatest. We have ruled out w and x.
-		else if (yD > zD) {
-			yD = FloatMath.sqrt(yD);
-			y = 0.5f * yD;
-			yD = 0.5f / yD;
-			w = (rotation.m02 - rotation.m20) * yD;
-			x = (rotation.m01 + rotation.m10) * yD;
-			z = (rotation.m12 + rotation.m21) * yD;
-		}
-		// The z divisor is greatest. We have ruled out w, x, and y.
-		else {
-			zD = FloatMath.sqrt(zD);
-			z = 0.5f * zD;
-			zD = 0.5f / zD;
-			w = (rotation.m10 - rotation.m01) * zD;
-			x = (rotation.m02 + rotation.m20) * zD;
-			y = (rotation.m12 + rotation.m21) * zD;
-		}
-
-		// TODO Test this method!
-		
-		return;
-	}
-
 	public Quaternion set(float w, float x, float y, float z) {
 		this.w = w;
 		this.x = x;
@@ -145,7 +62,7 @@ public class Quaternion {
 		this.z = z;
 		return this;
 	}
-	
+
 	public Quaternion set(float w, Vector3f vector) {
 		this.w = w;
 		x = vector.x;
@@ -153,7 +70,7 @@ public class Quaternion {
 		z = vector.z;
 		return this;
 	}
-	
+
 	public Quaternion set(Quaternion q) {
 		w = q.w;
 		x = q.x;
@@ -161,7 +78,7 @@ public class Quaternion {
 		z = q.z;
 		return this;
 	}
-	
+
 	public Quaternion add(float w, float x, float y, float z) {
 		return add(w, x, y, z, this);
 	}
@@ -379,6 +296,8 @@ public class Quaternion {
 		return cache;
 	}
 
+	// TODO Change this to a static Matrix3f method, e.g.,
+	// Matrix3f.fromQuaternion(Quaternion q, Matrix3f cache)
 	public Matrix3f fillRotationMatrix(Matrix3f matrix) {
 		if (matrix == null) {
 			matrix = new Matrix3f();
@@ -428,5 +347,213 @@ public class Quaternion {
 		matrix.m22 = 1 - (fxx + fyy);
 
 		return matrix;
+	}
+
+	// ---- Static Helpers for Creating Quaternions ---- //
+	// These are placed here and do not have constructors for multiple reasons:
+	// (1) The code is more complex. A method with a cache is preferred, as the
+	// code would otherwise be duplicated in constructors and setters.
+	// (2) The code is computationally slower than what might be expected from a
+	// constructor.
+
+	/**
+	 * Computes a quaternion representing a rotation by an angle around a fixed
+	 * (Euler) axis. The result is stored in a new Quaternion.
+	 * 
+	 * @param axis
+	 *            The vector representing an Euler axis. If this is the same as
+	 *            the zero vector, the returned quaternion is the
+	 *            {@link #IDENTITY}.
+	 * @param angle
+	 *            The rotation angle.
+	 * @return A new quaternion representing the angle-axis rotation.
+	 */
+	public static Quaternion fromAxisAngle(Vector3f axis, float angle) {
+		return fromAxisAngle(axis, angle, null);
+	}
+
+	/**
+	 * Computes a quaternion representing a rotation by an angle around a fixed
+	 * (Euler) axis. The result is stored in a the cache.
+	 * 
+	 * @param axis
+	 *            The vector representing an Euler axis. If this is the same as
+	 *            the zero vector, the returned quaternion is the
+	 *            {@link #IDENTITY}.
+	 * @param angle
+	 *            The rotation angle.
+	 * @param cache
+	 *            The quaternion in which to store the angle-axis rotation.
+	 * @return The cache quaternion.
+	 */
+	public static Quaternion fromAxisAngle(Vector3f axis, float angle,
+			Quaternion cache) {
+		return fromUnitAxisAngle(axis.normalize(null), angle, cache);
+	}
+
+	/**
+	 * Computes a quaternion representing a rotation by an angle around a fixed
+	 * (Euler) axis. The result is stored in a new Quaternion.
+	 * 
+	 * @param axis
+	 *            The vector representing an Euler axis. If this is the same as
+	 *            the zero vector, the returned quaternion is the
+	 *            {@link #IDENTITY}. <b><i>This is expected to be a unit vector.
+	 *            Unexpected results may occur if it is not!</i></b>
+	 * @param angle
+	 *            The rotation angle.
+	 * @return A new quaternion representing the angle-axis rotation.
+	 */
+	public static Quaternion fromUnitAxisAngle(Vector3f axis, float angle) {
+		return fromUnitAxisAngle(axis, angle, null);
+	}
+
+	/**
+	 * Computes a quaternion representing a rotation by an angle around a fixed
+	 * (Euler) axis. The result is stored in a the cache.
+	 * 
+	 * @param axis
+	 *            The vector representing an Euler axis. If this is the same as
+	 *            the zero vector, the returned quaternion is the
+	 *            {@link #IDENTITY}. <b><i>This is expected to be a unit vector.
+	 *            Unexpected results may occur if it is not!</i></b>
+	 * @param angle
+	 *            The rotation angle.
+	 * @param cache
+	 *            The quaternion in which to store the angle-axis rotation.
+	 * @return The cache quaternion.
+	 */
+	public static Quaternion fromUnitAxisAngle(Vector3f axis, float angle,
+			Quaternion cache) {
+		if (cache == null) {
+			cache = new Quaternion();
+		}
+		// Make sure this isn't a rotation around the origin. If not, normalize
+		// the vector, then compute the rotation quaternion.
+		if (axis.x != 0f || axis.y != 0f || axis.x != 0f) {
+			float halfAngle = 0.5f * angle;
+			float sinHalfAngle = FloatMath.sin(halfAngle);
+			cache.w = FloatMath.cos(halfAngle);
+			cache.x = axis.x * sinHalfAngle;
+			cache.y = axis.y * sinHalfAngle;
+			cache.z = axis.z * sinHalfAngle;
+		}
+		// If this is rotation about the origin, load the identity quaternion.
+		else {
+			cache.w = IDENTITY.w;
+			cache.x = IDENTITY.x;
+			cache.y = IDENTITY.y;
+			cache.z = IDENTITY.z;
+		}
+		return cache;
+	}
+
+	/**
+	 * Computes a quaternion representing a rotation from a vector <i>u</i> to a
+	 * vector <i>v</i>.
+	 * 
+	 * @param u
+	 * @param v
+	 * @return
+	 */
+	public static Quaternion fromTwoVectors(Vector3f u, Vector3f v) {
+		return fromTwoVectors(u, v, null);
+	}
+
+	public static Quaternion fromTwoVectors(Vector3f u, Vector3f v,
+			Quaternion cache) {
+		if (cache == null) {
+			cache = new Quaternion();
+		}
+
+		// http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+		Vector3f cross = u.cross(v);
+		cache.w = u.dot(v);
+		cache.x = cross.x;
+		cache.y = cross.y;
+		cache.z = cross.z;
+		cache.w += cache.norm();
+		cache.normalize();
+
+		// TODO Clean this.
+		
+		return cache;
+	}
+
+	public static Quaternion fromTwoUnitVectors(Vector3f u, Vector3f v) {
+		return fromTwoUnitVectors(u, v, null);
+	}
+
+	public static Quaternion fromTwoUnitVectors(Vector3f u, Vector3f v,
+			Quaternion cache) {
+		// TODO
+		return cache;
+	}
+
+	public static Quaternion fromRotationMatrix(Matrix3f rotation) {
+		return fromRotationMatrix(rotation, null);
+	}
+
+	public static Quaternion fromRotationMatrix(Matrix3f rotation,
+			Quaternion cache) {
+		if (cache == null) {
+			cache = new Quaternion();
+		}
+
+		// This is based off the algebra performed in
+		// http://www.ee.ucr.edu/~farrell/AidedNavigation/D_App_Quaternions/Rot2Quat.pdf
+
+		// To minimize the chance of dividing by zero, we compute the list of
+		// possible divisors and pick the largest non-zero value.
+
+		// We have four possible divisors for determining the quaternion from
+		// the rotation matrix. We should use the greatest divisor furthest from
+		// 0! Note that all values are positive.
+		float wD = Math.abs(1f + rotation.m00 + rotation.m11 + rotation.m22);
+		float xD = Math.abs(1f + rotation.m00 - rotation.m11 - rotation.m22);
+		float yD = Math.abs(1f - rotation.m00 + rotation.m11 - rotation.m22);
+		float zD = Math.abs(1f - rotation.m00 - rotation.m11 + rotation.m22);
+
+		// See if the w divisor is the greatest.
+		if (wD > xD && wD > yD && wD > zD) {
+			wD = FloatMath.sqrt(wD);
+			cache.w = 0.5f * wD;
+			wD = 0.5f / wD;
+			cache.x = (rotation.m21 - rotation.m12) * wD;
+			cache.y = (rotation.m02 - rotation.m20) * wD;
+			cache.z = (rotation.m10 - rotation.m01) * wD;
+		}
+		// See if the x divisor is the greatest. We have ruled out w.
+		else if (xD > yD && xD > zD) {
+			xD = FloatMath.sqrt(xD);
+			cache.x = 0.5f * xD;
+			xD = 0.5f / xD;
+			cache.w = (rotation.m21 - rotation.m12) * xD;
+			cache.y = (rotation.m01 + rotation.m10) * xD;
+			cache.z = (rotation.m02 + rotation.m20) * xD;
+		}
+		// See if the y divisor is the greatest. We have ruled out w and x.
+		else if (yD > zD) {
+			yD = FloatMath.sqrt(yD);
+			cache.y = 0.5f * yD;
+			yD = 0.5f / yD;
+			cache.w = (rotation.m02 - rotation.m20) * yD;
+			cache.x = (rotation.m01 + rotation.m10) * yD;
+			cache.z = (rotation.m12 + rotation.m21) * yD;
+		}
+		// The z divisor is greatest. We have ruled out w, x, and y.
+		else {
+			zD = FloatMath.sqrt(zD);
+			cache.z = 0.5f * zD;
+			zD = 0.5f / zD;
+			cache.w = (rotation.m10 - rotation.m01) * zD;
+			cache.x = (rotation.m02 + rotation.m20) * zD;
+			cache.y = (rotation.m12 + rotation.m21) * zD;
+		}
+
+		// TODO Test this method!
+		// TODO This might be simplified...
+
+		return cache;
 	}
 }
