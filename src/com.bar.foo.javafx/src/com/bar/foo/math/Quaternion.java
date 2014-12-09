@@ -82,13 +82,60 @@ public class Quaternion {
 	}
 	
 	public Quaternion(Matrix3f rotation) {
-		// which is bigger? w, x, y, or z?
-		// w = 1/2 * sqrt(1 + m00 + m11 + m22)
-		// x = 1/2 * sqrt(1 + m00 - m11 - m22)
-		// y = 1/2 * sqrt(1 - m00 + m11 - m22)
-		// z = 1/2 * sqrt(1 - m00 - m11 + m22)
+		// This is based off the algebra performed in
+		// http://www.ee.ucr.edu/~farrell/AidedNavigation/D_App_Quaternions/Rot2Quat.pdf
+
+		// To minimize the chance of dividing by zero, we compute the list of
+		// possible divisors and pick the largest non-zero value.
+
+		// We have four possible divisors for determining the quaternion from
+		// the rotation matrix. We should use the greatest divisor furthest from
+		// 0! Note that all values are positive.
+		float wD = Math.abs(1f + rotation.m00 + rotation.m11 + rotation.m22);
+		float xD = Math.abs(1f + rotation.m00 - rotation.m11 - rotation.m22);
+		float yD = Math.abs(1f - rotation.m00 + rotation.m11 - rotation.m22);
+		float zD = Math.abs(1f - rotation.m00 - rotation.m11 + rotation.m22);
+
+		// See if the w divisor is the greatest.
+		if (wD > xD && wD > yD && wD > zD) {
+			wD = FloatMath.sqrt(wD);
+			w = 0.5f * wD;
+			wD = 0.5f / wD;
+			x = (rotation.m21 - rotation.m12) * wD;
+			y = (rotation.m02 - rotation.m20) * wD;
+			z = (rotation.m10 - rotation.m01) * wD;
+		}
+		// See if the x divisor is the greatest. We have ruled out w.
+		else if (xD > yD && xD > zD) {
+			xD = FloatMath.sqrt(xD);
+			x = 0.5f * xD;
+			xD = 0.5f / xD;
+			w = (rotation.m21 - rotation.m12) * xD;
+			y = (rotation.m01 + rotation.m10) * xD;
+			z = (rotation.m02 + rotation.m20) * xD;
+		}
+		// See if the y divisor is the greatest. We have ruled out w and x.
+		else if (yD > zD) {
+			yD = FloatMath.sqrt(yD);
+			y = 0.5f * yD;
+			yD = 0.5f / yD;
+			w = (rotation.m02 - rotation.m20) * yD;
+			x = (rotation.m01 + rotation.m10) * yD;
+			z = (rotation.m12 + rotation.m21) * yD;
+		}
+		// The z divisor is greatest. We have ruled out w, x, and y.
+		else {
+			zD = FloatMath.sqrt(zD);
+			z = 0.5f * zD;
+			zD = 0.5f / zD;
+			w = (rotation.m10 - rotation.m01) * zD;
+			x = (rotation.m02 + rotation.m20) * zD;
+			y = (rotation.m12 + rotation.m21) * zD;
+		}
+
+		// TODO Test this method!
 		
-		
+		return;
 	}
 
 	public Quaternion set(float w, float x, float y, float z) {
