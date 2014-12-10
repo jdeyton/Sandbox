@@ -19,22 +19,25 @@ import javafx.scene.transform.Translate;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import com.bar.foo.javafx.Node;
-import com.bar.foo.javafx.app.IMasterApplication;
-import com.bar.foo.javafx.camera.FlyCamera;
+import com.bar.foo.javafx.IFrameRateManager;
 import com.bar.foo.javafx.input.ControlManager;
 import com.bar.foo.javafx.input.KeyToggleAction;
 import com.bar.foo.javafx.input.MouseAnalogAction;
 import com.bar.foo.javafx.input.MouseCode;
 import com.bar.foo.javafx.input.MouseToggleAction;
+import com.bar.foo.javafx.scene.Node;
+import com.bar.foo.javafx.scene.camera.FlyCamera;
 import com.bar.foo.math.Vector3f;
 
 /**
  * @author Jordan Deyton
  *
  */
-public class EmbeddedView implements IMasterApplication {
+public class EmbeddedView implements IFrameRateManager {
 
+	// TODO Migrate relevant code to BasicView and sub-class it to get the box
+	// views.
+	
 	private final Node root;
 	private final FlyCamera camera;
 
@@ -176,8 +179,14 @@ public class EmbeddedView implements IMasterApplication {
 		}
 	}
 
+
 	@Override
-	public float getTimePerFrame() {
+	public float getFPS() {
+		return 1f / tpf;
+	}
+
+	@Override
+	public float getTPF() {
 		return tpf;
 	}
 

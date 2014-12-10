@@ -3,7 +3,7 @@
  */
 package com.bar.foo.javafx.input;
 
-import com.bar.foo.javafx.app.IMasterApplication;
+import com.bar.foo.javafx.IFrameRateManager;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -15,8 +15,8 @@ import javafx.scene.input.KeyEvent;
 public class KeyActionHandler extends ActionHandler<KeyCode, KeyEvent> {
 
 	// TODO documentation
-	public KeyActionHandler(IMasterApplication app) {
-		super(app);
+	public KeyActionHandler(IFrameRateManager frameRateManager) {
+		super(frameRateManager);
 	}
 
 	/*

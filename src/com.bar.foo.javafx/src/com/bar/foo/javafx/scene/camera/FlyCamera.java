@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.bar.foo.javafx.camera;
+package com.bar.foo.javafx.scene.camera;
 
 import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
@@ -10,11 +10,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.transform.Rotate;
 
-import com.bar.foo.javafx.Node;
 import com.bar.foo.javafx.input.ControlManager;
 import com.bar.foo.javafx.input.IControlContributor;
 import com.bar.foo.javafx.input.KeyAnalogAction;
 import com.bar.foo.javafx.input.KeyToggleAction;
+import com.bar.foo.javafx.scene.Node;
 import com.bar.foo.math.FloatMath;
 import com.bar.foo.math.Matrix3f;
 import com.bar.foo.math.Quaternion;

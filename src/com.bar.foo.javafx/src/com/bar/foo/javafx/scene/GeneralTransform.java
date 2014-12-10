@@ -1,4 +1,4 @@
-package com.bar.foo.javafx;
+package com.bar.foo.javafx.scene;
 
 import javafx.scene.transform.Transform;
 

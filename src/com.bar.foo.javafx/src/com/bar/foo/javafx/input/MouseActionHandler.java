@@ -3,7 +3,7 @@
  */
 package com.bar.foo.javafx.input;
 
-import com.bar.foo.javafx.app.IMasterApplication;
+import com.bar.foo.javafx.IFrameRateManager;
 
 import javafx.scene.input.MouseEvent;
 
@@ -14,8 +14,8 @@ import javafx.scene.input.MouseEvent;
 public class MouseActionHandler extends ActionHandler<MouseCode, MouseEvent> {
 
 	// TODO documentation.
-	public MouseActionHandler(IMasterApplication app) {
-		super(app);
+	public MouseActionHandler(IFrameRateManager frameRateManager) {
+		super(frameRateManager);
 	}
 
 	/*

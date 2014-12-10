@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bar.foo.javafx.app.IMasterApplication;
+
+
+import com.bar.foo.javafx.IFrameRateManager;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -49,18 +51,18 @@ public abstract class ActionHandler<K, T extends Event> implements
 	private final Map<K, List<ToggleAction<T>>> toggleMap;
 
 	// TODO documentation
-	private final IMasterApplication app;
-
+	private final IFrameRateManager frameRateManager;
+	
 	/**
 	 * The default constructor.
 	 * @param app // TODO documentation.
 	 */
-	public ActionHandler(IMasterApplication app) {
+	public ActionHandler(IFrameRateManager frameRateManager) {
 		// Initialize the maps here to prevent ugly code formatting.
 		analogMap = new HashMap<K, List<AnalogAction<T>>>();
 		toggleMap = new HashMap<K, List<ToggleAction<T>>>();
-
-		this.app = app;
+		
+		this.frameRateManager = frameRateManager;
 	}
 
 	public boolean addAnalog(K key, AnalogAction<T> action) {
@@ -112,11 +114,11 @@ public abstract class ActionHandler<K, T extends Event> implements
 		if (toggles != null) {
 			if (isOn(event)) {
 				for (ToggleAction<T> toggle : toggles) {
-					toggle.on(app.getTimePerFrame(), event);
+					toggle.on(frameRateManager.getTPF(), event);
 				}
 			} else {
 				for (ToggleAction<T> toggle : toggles) {
-					toggle.off(app.getTimePerFrame(), event);
+					toggle.off(frameRateManager.getTPF(), event);
 				}
 			}
 		}
@@ -125,7 +127,7 @@ public abstract class ActionHandler<K, T extends Event> implements
 		if (analogs != null) {
 			float value = getValue(event);
 			for (AnalogAction<T> analog : analogs) {
-				analog.run(value, app.getTimePerFrame(), event);
+				analog.run(value, frameRateManager.getTPF(), event);
 			}
 		}
 

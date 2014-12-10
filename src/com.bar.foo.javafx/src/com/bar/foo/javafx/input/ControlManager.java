@@ -6,8 +6,7 @@ package com.bar.foo.javafx.input;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bar.foo.javafx.app.IMasterApplication;
-import com.bar.foo.javafx.test.EmbeddedView;
+import com.bar.foo.javafx.IFrameRateManager;
 
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -29,13 +28,9 @@ public class ControlManager {
 	public final KeyActionHandler keys;
 	public final MouseActionHandler mouse;
 
-	private final IMasterApplication app;
-
-	public ControlManager(IMasterApplication app) {
-		this.app = app;
-
-		keys = new KeyActionHandler(app);
-		mouse = new MouseActionHandler(app);
+	public ControlManager(IFrameRateManager frameRateManager) {
+		keys = new KeyActionHandler(frameRateManager);
+		mouse = new MouseActionHandler(frameRateManager);
 	}
 
 	/**

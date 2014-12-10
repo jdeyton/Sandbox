@@ -1,4 +1,4 @@
-package com.bar.foo.javafx.app;
+package com.bar.foo.javafx.test;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -13,8 +13,9 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
-import com.bar.foo.javafx.Node;
+import com.bar.foo.javafx.scene.Node;
 
+// TODO Remove this class.
 public class TestApplication extends Application {
 
 	private final Scene scene;

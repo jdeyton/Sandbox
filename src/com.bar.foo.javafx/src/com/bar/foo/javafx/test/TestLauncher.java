@@ -6,8 +6,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import com.bar.foo.javafx.app.TestApplication;
-
 public class TestLauncher {
 
 	private Shell shell;

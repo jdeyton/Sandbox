@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.bar.foo.javafx.Node;
+import com.bar.foo.javafx.scene.Node;
 
 /**
  * @author Jordan Deyton
