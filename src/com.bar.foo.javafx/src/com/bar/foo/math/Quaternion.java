@@ -430,7 +430,7 @@ public class Quaternion {
 		}
 		// Make sure this isn't a rotation around the origin. If not, normalize
 		// the vector, then compute the rotation quaternion.
-		if (axis.x != 0f || axis.y != 0f || axis.x != 0f) {
+		if (angle != 0f && (axis.x != 0f || axis.y != 0f || axis.x != 0f)) {
 			float halfAngle = 0.5f * angle;
 			float sinHalfAngle = FloatMath.sin(halfAngle);
 			cache.w = FloatMath.cos(halfAngle);
@@ -445,6 +445,7 @@ public class Quaternion {
 			cache.y = IDENTITY.y;
 			cache.z = IDENTITY.z;
 		}
+		// TODO Test case where angle is 0.
 		return cache;
 	}
 
@@ -466,18 +467,50 @@ public class Quaternion {
 			cache = new Quaternion();
 		}
 
+		// See the site below for a good discussion on how to simplify the code.
 		// http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
-		Vector3f cross = u.cross(v);
-		cache.w = u.dot(v);
-		cache.x = cross.x;
-		cache.y = cross.y;
-		cache.z = cross.z;
-		cache.w += cache.norm();
-		cache.normalize();
 
-		// TODO Clean this.
-		
-		return cache;
+		float w;
+		Vector3f orthogonal;
+
+		float uDotV = u.dot(v);
+		// ||u||*||v|| can be combined into a single square root.
+		float magUmagV = FloatMath.sqrt(u.lengthSquared() * v.lengthSquared());
+
+		w = uDotV + magUmagV;
+
+		// If the dot product + magnitude of u * magnitude of v is zero, the
+		// vectors u and v are (nearly) opposite (u.v = |u||v|cos(theta) where
+		// theta is 180 yields u.v = -|u||v|).
+		if (Math.abs(w) > 1e-5f) {
+			// For non-opposite vectors, use the cross product to get an
+			// orthogonal vector.
+			orthogonal = u.cross(v);
+		} else {
+			// For opposite vectors, select an arbitrary orthogonal vector.
+
+			w = 0f; // Why isn't this u.dot(w) + magUmagW?
+			// u.dot(w) is 0, but magUmagW is not...
+			if (Math.abs(u.x) > Math.abs(u.z)) {
+				orthogonal = new Vector3f(-u.y, u.x, 0f);
+			} else {
+				orthogonal = new Vector3f(0f, -u.z, u.y);
+			}
+		}
+
+		return cache.set(w, orthogonal).normalize();
+
+//		// Fleshing out the above operations lets us avoid normalize calls...
+//		// This results in 3 fewer additions and 2 fewer multiplications
+//		cache.set(u.dot(v), u.cross(v));
+//		float magQ2 = cache.normSquared();
+//		float magQ = FloatMath.sqrt(magQ2);
+//		float inverseMagQprime = 1f / FloatMath.sqrt(2f * (magQ2 + cache.w
+//				* magQ));
+//		return cache.set((cache.w + magQ) * inverseMagQprime, cache.x
+//				* inverseMagQprime, cache.y * inverseMagQprime, cache.z
+//				* inverseMagQprime);
+		// TODO Test this method.
 	}
 
 	public static Quaternion fromTwoUnitVectors(Vector3f u, Vector3f v) {
@@ -486,8 +519,44 @@ public class Quaternion {
 
 	public static Quaternion fromTwoUnitVectors(Vector3f u, Vector3f v,
 			Quaternion cache) {
-		// TODO
-		return cache;
+		if (cache == null) {
+			cache = new Quaternion();
+		}
+
+		// See the site below for a good discussion on how to simplify the code.
+		// http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+
+		float w;
+		Vector3f orthogonal;
+
+		float uDotV = u.dot(v);
+		// ||u||*||v|| can be combined into a single square root.
+		// Since u and v are unit vectors, their magnitudes are 1.
+		float magUmagV = 1f;
+
+		w = uDotV + magUmagV;
+
+		// If the dot product + magnitude of u * magnitude of v is zero, the
+		// vectors u and v are (nearly) opposite (u.v = |u||v|cos(theta) where
+		// theta is 180 yields u.v = -|u||v|).
+		if (Math.abs(w) > 1e-5f) {
+			// For non-opposite vectors, use the cross product to get an
+			// orthogonal vector.
+			orthogonal = u.cross(v);
+		} else {
+			// For opposite vectors, select an arbitrary orthogonal vector.
+
+			w = 0f; // Why isn't this u.dot(w) + magUmagW?
+			// u.dot(w) is 0, but magUmagW is not...
+			if (Math.abs(u.x) > Math.abs(u.z)) {
+				orthogonal = new Vector3f(-u.y, u.x, 0f);
+			} else {
+				orthogonal = new Vector3f(0f, -u.z, u.y);
+			}
+		}
+
+		return cache.set(w, orthogonal).normalize();
+		// TODO Test this method.
 	}
 
 	public static Quaternion fromRotationMatrix(Matrix3f rotation) {

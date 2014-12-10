@@ -121,9 +121,20 @@ public class FlyCamera extends Node implements IControlContributor {
 		// Attach the PerspectiveCamera to this Node (Group).
 		getChildren().add(camera);
 
-		setPosition(new Vector3f(1000f, 0f, 1000f));
-		setOrientation(new Vector3f(-1f, 0f, -1f), new Vector3f(0f, 1f, 0f));
-		
+		// Views the scene from the positive x = z axis.
+//		setPosition(new Vector3f(1000f, 0f, 1000f));
+//		setOrientation(new Vector3f(-1f, 0f, -1f), new Vector3f(0f, 1f, 0f));
+
+		// Views the scene from the negative z axis. The direction is 180
+		// degrees from the default direction.
+//		setPosition(new Vector3f(0f, 0f, -1000f));
+//		setOrientation(new Vector3f(0f, 0f, 1f), new Vector3f(0f, 1f, 0f));
+
+		// This flips the camera on its side, with x up and y left. It still
+		// looks in the negative z direction.
+		setPosition(new Vector3f(0f, 0f, 1000f));
+		setOrientation(new Vector3f(0f, 0f, -1f), new Vector3f(1f, 0f, 0f));
+
 		return;
 	}
 
@@ -367,33 +378,22 @@ public class FlyCamera extends Node implements IControlContributor {
 			throw new IllegalArgumentException("FlightCamera error: "
 					+ "Direction and up vector are not orthogonal.");
 		}
-		
-//		// Update the local orientation vectors. Since this is a right-handed
-//		// system, get the right vector by crossing direction with up.
-//		direction.normalize(this.dir);
-//		up.normalize(this.up);
-////		this.dir.cross(up, this.right).normalize();
-//		this.up.cross(this.dir, this.left).normalize();
-//
-//		// We also need to set the up vector for dragging, otherwise trying to
-//		// drag to rotate will use the old dragUp vector for yaw rotation.
-//		dragUp.set(this.up);
-//
-//		// Update the rotation part of the transform.
-//		Matrix3f matrix = new Matrix3f(this.left, this.up, this.dir);
-//		Quaternion q = new Quaternion(matrix);
-//		transform.rotation.set(q);
-//		transform.refresh(true);
 
-//		// Now we have the new dir, up, and right vectors, all normalized.
-//		Vector3f right = direction.normalize().cross(up.normalize())
-//				.normalize();
+		// We can treat this like the rotation between two planes:
+		// The source plane is the plane formed by defaultDir and defaultUp.
+		// The destination plane is the plane formed by direction and up.
+		// The resulting rotation can be computed from the *normal* vectors for
+		// those planes, i.e. defaultRight and right computed from direction and
+		// up.
 
-		Quaternion q = Quaternion.fromTwoVectors(defaultDir,
-				direction.normalize());
+		// This is a right-handed system. Compute right by crossing direction
+		// with up.
+		Vector3f right = direction.cross(up).normalize();
+
+		Quaternion q = Quaternion.fromTwoUnitVectors(defaultRight, right);
 		transform.rotation.set(q);
 		transform.refresh(true);
-		
+
 		return;
 	}
 
