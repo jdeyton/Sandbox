@@ -6,6 +6,9 @@ package com.bar.foo.javafx.input;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bar.foo.javafx.app.IMasterApplication;
+import com.bar.foo.javafx.test.EmbeddedView;
+
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -23,8 +26,17 @@ public class ControlManager {
 	 */
 	private final List<Scene> managedScenes = new ArrayList<Scene>();
 
-	public final KeyActionHandler keys = new KeyActionHandler();
-	public final MouseActionHandler mouse = new MouseActionHandler();
+	public final KeyActionHandler keys;
+	public final MouseActionHandler mouse;
+
+	private final IMasterApplication app;
+
+	public ControlManager(IMasterApplication app) {
+		this.app = app;
+
+		keys = new KeyActionHandler(app);
+		mouse = new MouseActionHandler(app);
+	}
 
 	/**
 	 * Adds a {@code Scene} whose controls will be managed by this
@@ -44,7 +56,7 @@ public class ControlManager {
 			// Register key event handlers.
 			scene.addEventHandler(KeyEvent.KEY_PRESSED, keys);
 			scene.addEventHandler(KeyEvent.KEY_RELEASED, keys);
-			
+
 			// Register mouse event handlers.
 			scene.addEventFilter(MouseEvent.MOUSE_PRESSED, mouse);
 			scene.addEventFilter(MouseEvent.MOUSE_RELEASED, mouse);
@@ -70,7 +82,7 @@ public class ControlManager {
 			// Unregister key event handlers.
 			scene.removeEventHandler(KeyEvent.KEY_PRESSED, keys);
 			scene.removeEventHandler(KeyEvent.KEY_RELEASED, keys);
-			
+
 			// TODO remove things added via addScene...
 		}
 		return removed;

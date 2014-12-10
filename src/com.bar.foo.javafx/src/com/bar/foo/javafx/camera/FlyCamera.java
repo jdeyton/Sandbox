@@ -191,6 +191,7 @@ public class FlyCamera extends Node implements IControlContributor {
 			controls.keys.addAnalog(KeyCode.W, new KeyAnalogAction() {
 				@Override
 				public void run(float value, float timePerFrame, KeyEvent event) {
+					System.out.println("Moving forward. Time per frame: " + timePerFrame);
 					transform.translation.subtract(0f, 0f, moveRate);
 					transform.refresh(false);
 				}

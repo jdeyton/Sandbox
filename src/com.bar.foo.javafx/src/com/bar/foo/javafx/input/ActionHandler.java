@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bar.foo.javafx.app.IMasterApplication;
+
 import javafx.event.Event;
 import javafx.event.EventHandler;
 
@@ -46,13 +48,19 @@ public abstract class ActionHandler<K, T extends Event> implements
 	 */
 	private final Map<K, List<ToggleAction<T>>> toggleMap;
 
+	// TODO documentation
+	private final IMasterApplication app;
+
 	/**
 	 * The default constructor.
+	 * @param app // TODO documentation.
 	 */
-	public ActionHandler() {
+	public ActionHandler(IMasterApplication app) {
 		// Initialize the maps here to prevent ugly code formatting.
 		analogMap = new HashMap<K, List<AnalogAction<T>>>();
 		toggleMap = new HashMap<K, List<ToggleAction<T>>>();
+
+		this.app = app;
 	}
 
 	public boolean addAnalog(K key, AnalogAction<T> action) {
@@ -95,17 +103,20 @@ public abstract class ActionHandler<K, T extends Event> implements
 	@Override
 	public void handle(T event) {
 		K key = getTrigger(event);
-		float timePerFrame = getTimePerFrame();
+
+		// FIXME Should this be done here or in the loops? It seems like it
+		// might be more accurate to do it below...
+		// float timePerFrame = app.getTimePerFrame();
 
 		List<ToggleAction<T>> toggles = toggleMap.get(key);
 		if (toggles != null) {
 			if (isOn(event)) {
 				for (ToggleAction<T> toggle : toggles) {
-					toggle.on(timePerFrame, event);
+					toggle.on(app.getTimePerFrame(), event);
 				}
 			} else {
 				for (ToggleAction<T> toggle : toggles) {
-					toggle.off(timePerFrame, event);
+					toggle.off(app.getTimePerFrame(), event);
 				}
 			}
 		}
@@ -114,7 +125,7 @@ public abstract class ActionHandler<K, T extends Event> implements
 		if (analogs != null) {
 			float value = getValue(event);
 			for (AnalogAction<T> analog : analogs) {
-				analog.run(value, timePerFrame, event);
+				analog.run(value, app.getTimePerFrame(), event);
 			}
 		}
 
@@ -122,10 +133,6 @@ public abstract class ActionHandler<K, T extends Event> implements
 		event.consume();
 
 		return;
-	}
-
-	protected float getTimePerFrame() {
-		return 0f;
 	}
 
 	protected abstract boolean isOn(T event);

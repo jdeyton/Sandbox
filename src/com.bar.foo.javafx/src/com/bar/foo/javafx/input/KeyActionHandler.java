@@ -3,6 +3,8 @@
  */
 package com.bar.foo.javafx.input;
 
+import com.bar.foo.javafx.app.IMasterApplication;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -10,8 +12,12 @@ import javafx.scene.input.KeyEvent;
  * @author Jordan Deyton
  *
  */
-public class KeyActionHandler extends
-		ActionHandler<KeyCode, KeyEvent> {
+public class KeyActionHandler extends ActionHandler<KeyCode, KeyEvent> {
+
+	// TODO documentation
+	public KeyActionHandler(IMasterApplication app) {
+		super(app);
+	}
 
 	/*
 	 * (non-Javadoc)

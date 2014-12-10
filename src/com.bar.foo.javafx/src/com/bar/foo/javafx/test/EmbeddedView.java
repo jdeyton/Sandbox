@@ -3,6 +3,7 @@
  */
 package com.bar.foo.javafx.test;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.embed.swt.FXCanvas;
 import javafx.scene.Scene;
@@ -19,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import com.bar.foo.javafx.Node;
+import com.bar.foo.javafx.app.IMasterApplication;
 import com.bar.foo.javafx.camera.FlyCamera;
 import com.bar.foo.javafx.input.ControlManager;
 import com.bar.foo.javafx.input.KeyToggleAction;
@@ -31,7 +33,7 @@ import com.bar.foo.math.Vector3f;
  * @author Jordan Deyton
  *
  */
-public class EmbeddedView {
+public class EmbeddedView implements IMasterApplication {
 
 	private final Node root;
 	private final FlyCamera camera;
@@ -40,10 +42,12 @@ public class EmbeddedView {
 	// Scenes must be constructed or modified on the Application thread.
 	private Scene scene;
 
-	private final ControlManager controls = new ControlManager();
+	private final ControlManager controls = new ControlManager(this);
 
 	private static final double radius = 100;
 
+	private float tpf = 0f;
+	
 	public EmbeddedView(Node parent, Color color) {
 		// Set up the root node.
 		root = new Node();
@@ -116,6 +120,20 @@ public class EmbeddedView {
 						System.out.println("mouse up...");
 					}
 				});
+	
+		// Use an AnimationTimer to compute the time per frame.
+		// Handle is triggered on every frame;
+		AnimationTimer timer = new AnimationTimer() {
+			private long previous;
+			@Override
+			public void handle(long now) {
+				// The time provided is in nanoseconds. Convert this to seconds.
+				tpf = (now - previous) * 0.000000001f;
+				previous = now;
+			}
+		};
+		timer.start();
+		// TODO stop the timer when appropriate.
 	}
 
 	public Node getRoot() {
@@ -156,6 +174,11 @@ public class EmbeddedView {
 				});
 			}
 		}
+	}
+
+	@Override
+	public float getTimePerFrame() {
+		return tpf;
 	}
 
 }
