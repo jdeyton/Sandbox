@@ -24,7 +24,12 @@ public class App implements IFrameRateManager {
 	private float timePerFrame;
 	// ------------------------------ //
 
-	// TODO Add containers for AppModes.
+	/**
+	 * A container for multiple {@link AppMode}s. This greatly simplifies the
+	 * work done by this class since it does not need to manage its own
+	 * concurrent list.
+	 */
+	private final CompositeAppMode modes = new CompositeAppMode();
 
 	/**
 	 * Whether or not the app has been started.
@@ -58,6 +63,16 @@ public class App implements IFrameRateManager {
 		return;
 	}
 
+	// TODO documentation...
+	public boolean addMode(AppMode mode) throws NullPointerException {
+		return modes.addSubMode(mode);
+	}
+
+	// TODO documentation...
+	public boolean removeMode(AppMode mode) {
+		return modes.removeSubMode(mode);
+	}
+
 	// ---- Lifecycle ---- //
 	/**
 	 * Gets whether or not the app has been initialized.
@@ -76,6 +91,7 @@ public class App implements IFrameRateManager {
 	public final boolean initialize() {
 		boolean wasStarted = false;
 		// TODO
+		modes.initialize(this);
 		return wasStarted;
 	}
 
