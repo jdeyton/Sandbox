@@ -14,7 +14,7 @@ package com.bar.foo.javafx.app;
  * @author Jordan
  *
  */
-public class AppMode {
+public abstract class AppMode {
 
 	/**
 	 * The parent {@link App} that this mode supports.
@@ -57,6 +57,36 @@ public class AppMode {
 	}
 
 	/**
+	 * If the mode is both initialized and enabled, then this method updates the
+	 * mode.
+	 * 
+	 * @param tpf
+	 *            The current time per frame as of the frame that triggered this
+	 *            call.
+	 */
+	public final void update(float tpf) {
+		if (isInitialized() && isEnabled()) {
+			updateMode(tpf);
+		}
+	}
+
+	/**
+	 * Updates the customizable features of this mode.
+	 * <p>
+	 * <b>Note:</b> If this method is overridden, then the sub-class' method
+	 * should call this method before returning.
+	 * </p>
+	 * 
+	 * @param tpf
+	 *            The current time per frame as of the frame that triggered this
+	 *            call.
+	 */
+	protected void updateMode(float tpf) {
+		// Nothing to do (yet).
+	}
+
+	// ---- Initialized ---- //
+	/**
 	 * Gets whether or not the mode has been initialized or associated with an
 	 * {@link #app}.
 	 * 
@@ -74,7 +104,7 @@ public class AppMode {
 	 *            The parent app that this mode supports.
 	 * @return True if the mode is initialized, false otherwise.
 	 * @throws NullPointerException
-	 *             if the mode is not initialized an a null app is specified
+	 *             if the mode is not initialized and a null app is specified
 	 */
 	public final boolean initialize(App app) throws NullPointerException {
 		boolean wasInitialized = false;
@@ -167,6 +197,9 @@ public class AppMode {
 		// Nothing to do (yet).
 	}
 
+	// --------------------- //
+
+	// ---- Enabled ---- //
 	/**
 	 * Gets whether or not the mode is enabled. If the mode is disabled, it is
 	 * "paused", or its effects (i.e., controls) have been disabled.
@@ -233,6 +266,9 @@ public class AppMode {
 		// Nothing to do (yet).
 	}
 
+	// ----------------- //
+
+	// ---- Visible ---- //
 	/**
 	 * Gets whether or not the mode is visible. If the mode is invisible, its
 	 * effects (i.e., additions to the {@link #app}'s scene) are not rendered.
@@ -298,4 +334,5 @@ public class AppMode {
 	protected void hideMode() {
 		// Nothing to do (yet).
 	}
+	// ----------------- //
 }
