@@ -56,24 +56,24 @@ public abstract class CompositeApp extends App {
 	public boolean addApp(App app) {
 		boolean added = false;
 		if (app != null) {
-//			appsReadLock.lock();
-//			try {
-				if (!apps.contains(app)) {
-					appsWriteLock.lock();
-					try {
-						apps.add(app);
-						added = true;
-					} finally {
-						appsWriteLock.unlock();
-					}
+			// appsReadLock.lock();
+			// try {
+			if (!apps.contains(app)) {
+				appsWriteLock.lock();
+				try {
+					apps.add(app);
+					added = true;
+				} finally {
+					appsWriteLock.unlock();
 				}
-//			} finally {
-//				appsReadLock.unlock();
-//			}
+
+				// TODO Start the new app.
+				app.setControlManager(getControlManager());
+			}
+			// } finally {
+			// appsReadLock.unlock();
+			// }
 		}
-
-		// TODO Start the new app.
-
 		return added;
 	}
 
@@ -101,131 +101,292 @@ public abstract class CompositeApp extends App {
 		return removed;
 	}
 
+	// ---- Implements IStartable ---- //
 	@Override
-	public boolean start() {
-		boolean changed = false;
-		// Only proceed if the app is currently STOPPED. Mark it as STARTING.
-		if (setStarting()) {
-			changed = true;
-
-			// Call the customizable initialization operation.
-			initApp();
-
-			// Enable the app and its controls as necessary. These may return
-			// false if the app or its controls should not be enabled yet.
-			enableApp();
-			enableAppControls(getControlManager());
-
-			// Start all of the child apps.
+	protected boolean initApp() {
+		boolean inited = canInit();
+		if (inited) {
 			runOnApps(new AppRunnable() {
 				@Override
 				public boolean run(App app) {
-					return app.start();
+					return app.initApp();
 				}
 			});
-
-			// Mark the app as STARTED.
-			setStarted();
 		}
-		return changed;
+		return inited;
 	}
 
 	@Override
-	public boolean stop() {
-		boolean changed = false;
-		// Only proceed if the app is currently STARTED. Mark it as STOPPING.
-		if (setStopping()) {
-
-			// Stop all of the child apps.
+	protected boolean disposeApp() {
+		boolean disposed = canDispose();
+		if (disposed) {
 			runOnApps(new AppRunnable() {
 				@Override
 				public boolean run(App app) {
-					return app.stop();
+					return app.disposeApp();
 				}
 			});
+		}
+		return disposed;
+	}
 
-			// Disable the app and its controls as necessary. These may return
-			// false if the app or its controls do not need to be disabled.
-			disableAppControls(getControlManager());
-			disableApp();
-
-			// Call the customizable disposal operation.
-			disposeApp();
-
-			// Mark the app as STOPPED.
-			setStopped();
+	@Override
+	protected boolean setStarting() {
+		boolean changed = super.setStarting();
+		if (changed) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.setStarting();
+				}
+			});
 		}
 		return changed;
 	}
 
 	@Override
-	public boolean setEnabled(boolean enabled) {
-		// Determine if the value has actually changed, while at the same time
-		// setting it to the new value.
-		boolean changed = false;
-		if (this.enabled.compareAndSet(!enabled, enabled)) {
-			changed = true;
-
-			// We should either enable or disable the app as necessary. These
-			// methods may return false if the app cannot be enabled/disabled.
-			AppRunnable runnable = null;
-			if (enabled) {
-				if (enableApp()) {
-					runnable = new AppRunnable() {
-						@Override
-						public boolean run(App app) {
-							return app.enableApp();
-						}
-					};
+	protected boolean setStarted() {
+		boolean changed = super.setStarted();
+		if (changed) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.setStarted();
 				}
-			} else if (disableApp()) {
-				runnable = new AppRunnable() {
-					@Override
-					public boolean run(App app) {
-						return app.disableApp();
-					}
-				};
-			}
-			// Enable/disable all of the child apps as necessary.
-			runOnApps(runnable);
+			});
 		}
 		return changed;
 	}
 
 	@Override
-	public boolean setControlsEnabled(boolean enabled) {
-		// Determine if the value has actually changed, while at the same time
-		// setting it to the new value.
-		boolean changed = false;
-		if (controlsEnabled.compareAndSet(!enabled, enabled)) {
-			changed = true;
-
-			// We should either enable or disable the app controls as necessary.
-			// These methods may return false if the app's controls cannot be
-			// enabled/disabled.
-			AppRunnable runnable = null;
-			final ControlManager manager = getControlManager();
-			if (enabled) {
-				if (enableAppControls(manager)) {
-					runnable = new AppRunnable() {
-						@Override
-						public boolean run(App app) {
-							return app.enableAppControls(manager);
-						}
-					};
+	protected boolean setStopping() {
+		boolean changed = super.setStopping();
+		if (changed) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.setStopping();
 				}
-			} else if (disableAppControls(manager)) {
-				runnable = new AppRunnable() {
-					@Override
-					public boolean run(App app) {
-						return app.disableAppControls(manager);
-					}
-				};
-			}
-			// Enable/disable all of the child app controls as necessary.
-			runOnApps(runnable);
+			});
 		}
 		return changed;
 	}
+
+	@Override
+	protected boolean setStopped() {
+		boolean changed = super.setStopped();
+		if (changed) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.setStopped();
+				}
+			});
+		}
+		return changed;
+	}
+
+	// ------------------------------- //
+
+	// ---- Implements IEnableable ---- //
+	@Override
+	protected boolean enableApp() {
+		boolean enabled = canEnable();
+		if (enabled) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.enableApp();
+				}
+			});
+		}
+		return enabled;
+	}
+
+	@Override
+	protected boolean disableApp() {
+		boolean disabled = canDisable();
+		if (disabled) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.disableApp();
+				}
+			});
+		}
+		return disabled;
+	}
+
+	// -------------------------------- //
+
+	// ---- Implements IControlProvider ---- //
+	@Override
+	protected boolean enableAppControls(ControlManager manager) {
+		boolean enabledControls = canEnableAppControls(manager);
+		if (enabledControls) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.enableAppControls(manager);
+				}
+			});
+		}
+		return enabledControls;
+	}
+
+	@Override
+	protected boolean disableAppControls(ControlManager manager) {
+		boolean disabledControls = canDisableAppControls(manager);
+		if (disabledControls) {
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.disableAppControls(manager);
+				}
+			});
+		}
+		return disabledControls;
+	}
+
+	@Override
+	public boolean setControlManager(ControlManager manager)
+			throws NullPointerException {
+		// TODO
+		return super.setControlManager(manager);
+	}
+
+	@Override
+	public boolean unsetControlManager() {
+		// TODO
+		return super.unsetControlManager();
+	}
+	// ------------------------------------- //
+
+	// @Override
+	// public boolean start() {
+	// boolean changed = false;
+	// // Only proceed if the app is currently STOPPED. Mark it as STARTING.
+	// if (setStarting()) {
+	// changed = true;
+	//
+	// // Call the customizable initialization operation.
+	// initApp();
+	//
+	// // Enable the app and its controls as necessary. These may return
+	// // false if the app or its controls should not be enabled yet.
+	// enableApp();
+	// enableAppControls(getControlManager());
+	//
+	// // Start all of the child apps.
+	// runOnApps(new AppRunnable() {
+	// @Override
+	// public boolean run(App app) {
+	// return app.start();
+	// }
+	// });
+	//
+	// // Mark the app as STARTED.
+	// setStarted();
+	// }
+	// return changed;
+	// }
+	//
+	// @Override
+	// public boolean stop() {
+	// boolean changed = false;
+	// // Only proceed if the app is currently STARTED. Mark it as STOPPING.
+	// if (setStopping()) {
+	//
+	// // Stop all of the child apps.
+	// runOnApps(new AppRunnable() {
+	// @Override
+	// public boolean run(App app) {
+	// return app.stop();
+	// }
+	// });
+	//
+	// // Disable the app and its controls as necessary. These may return
+	// // false if the app or its controls do not need to be disabled.
+	// disableAppControls(getControlManager());
+	// disableApp();
+	//
+	// // Call the customizable disposal operation.
+	// disposeApp();
+	//
+	// // Mark the app as STOPPED.
+	// setStopped();
+	// }
+	// return changed;
+	// }
+	//
+	// @Override
+	// public boolean setEnabled(boolean enabled) {
+	// // Determine if the value has actually changed, while at the same time
+	// // setting it to the new value.
+	// boolean changed = false;
+	// if (this.enabled.compareAndSet(!enabled, enabled)) {
+	// changed = true;
+	//
+	// // We should either enable or disable the app as necessary. These
+	// // methods may return false if the app cannot be enabled/disabled.
+	// AppRunnable runnable = null;
+	// if (enabled) {
+	// if (enableApp()) {
+	// runnable = new AppRunnable() {
+	// @Override
+	// public boolean run(App app) {
+	// return app.enableApp();
+	// }
+	// };
+	// }
+	// } else if (disableApp()) {
+	// runnable = new AppRunnable() {
+	// @Override
+	// public boolean run(App app) {
+	// return app.disableApp();
+	// }
+	// };
+	// }
+	// // Enable/disable all of the child apps as necessary.
+	// runOnApps(runnable);
+	// }
+	// return changed;
+	// }
+	//
+	// @Override
+	// public boolean setControlsEnabled(boolean enabled) {
+	// // Determine if the value has actually changed, while at the same time
+	// // setting it to the new value.
+	// boolean changed = false;
+	// if (controlsEnabled.compareAndSet(!enabled, enabled)) {
+	// changed = true;
+	//
+	// // We should either enable or disable the app controls as necessary.
+	// // These methods may return false if the app's controls cannot be
+	// // enabled/disabled.
+	// AppRunnable runnable = null;
+	// final ControlManager manager = getControlManager();
+	// if (enabled) {
+	// if (enableAppControls(manager)) {
+	// runnable = new AppRunnable() {
+	// @Override
+	// public boolean run(App app) {
+	// return app.enableAppControls(manager);
+	// }
+	// };
+	// }
+	// } else if (disableAppControls(manager)) {
+	// runnable = new AppRunnable() {
+	// @Override
+	// public boolean run(App app) {
+	// return app.disableAppControls(manager);
+	// }
+	// };
+	// }
+	// // Enable/disable all of the child app controls as necessary.
+	// runOnApps(runnable);
+	// }
+	// return changed;
+	// }
 
 }

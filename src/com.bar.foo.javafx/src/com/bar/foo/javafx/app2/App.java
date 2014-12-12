@@ -41,13 +41,17 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		return changed;
 	}
 
-	protected boolean enableAppControls(ControlManager manager) {
+	protected boolean canEnableAppControls(ControlManager manager) {
 		return (controlsEnabled() && manager != null && (isStarted() || isStarting()));
 	}
+	
+	protected abstract boolean enableAppControls(ControlManager manager);
 
-	protected boolean disableAppControls(ControlManager manager) {
+	protected boolean canDisableAppControls(ControlManager manager) {
 		return (!controlsEnabled() && manager != null);
 	}
+	
+	protected abstract boolean disableAppControls(ControlManager manager);
 
 	@Override
 	public boolean controlsEnabled() {
@@ -124,13 +128,17 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		return changed;
 	}
 
-	protected boolean enableApp() {
+	protected boolean canEnable() {
 		return (isEnabled() && (isStarted() || isStarting()));
 	}
 
-	protected boolean disableApp() {
+	protected abstract boolean enableApp();
+
+	protected boolean canDisable() {
 		return (!isEnabled());
 	}
+
+	protected abstract boolean disableApp();
 
 	@Override
 	public boolean isEnabled() {
@@ -161,9 +169,11 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		return changed;
 	}
 
-	protected boolean initApp() {
+	protected boolean canInit() {
 		return isStarting();
 	}
+	
+	protected abstract boolean initApp();
 
 	@Override
 	public boolean stop() {
@@ -185,9 +195,11 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		return changed;
 	}
 
-	protected boolean disposeApp() {
+	protected boolean canDispose() {
 		return isStopping();
 	}
+	
+	protected abstract boolean disposeApp();
 
 	@Override
 	public boolean isStarted() {
@@ -204,19 +216,19 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		return startState.get() == 3;
 	}
 
-	protected final boolean setStarting() {
+	protected boolean setStarting() {
 		return startState.compareAndSet(0, 2);
 	}
 
-	protected final boolean setStarted() {
+	protected boolean setStarted() {
 		return startState.compareAndSet(2, 1);
 	}
 
-	protected final boolean setStopping() {
+	protected boolean setStopping() {
 		return startState.compareAndSet(1, 3);
 	}
 
-	protected final boolean setStopped() {
+	protected boolean setStopped() {
 		return startState.compareAndSet(3, 0);
 	}
 

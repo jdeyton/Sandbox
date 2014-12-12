@@ -1,9 +1,9 @@
 package com.bar.foo.javafx.app2.test;
 
-import com.bar.foo.javafx.app2.App;
+import com.bar.foo.javafx.app2.CompositeApp;
 import com.bar.foo.javafx.input.ControlManager;
 
-public class TestChildApp extends App {
+public class TestCompositeApp extends CompositeApp {
 
 	public boolean startCalled = false;
 	public boolean wasStarted = false;
@@ -125,5 +125,4 @@ public class TestChildApp extends App {
 	protected void update(float tpf) {
 		updateCalled = true;
 	}
-
 }

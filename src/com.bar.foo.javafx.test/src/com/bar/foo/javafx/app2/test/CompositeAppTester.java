@@ -13,33 +13,61 @@ public class CompositeAppTester {
 
 	@Test
 	public void checkStart() {
-		CompositeApp composite = new CompositeApp() {
-			@Override
-			protected void update(float tpf) {
-				// Nothing to do.
-			}
-		};
+		TestCompositeApp composite = new TestCompositeApp();
 		composite.setControlManager(new ControlManager(null));
-		
-		TestChildApp child = new TestChildApp();
+
+		TestCompositeApp child = new TestCompositeApp();
 		composite.addApp(child);
-		
-		assertFalse(child.startCalled);
-		assertFalse(child.initCalled);
-		assertFalse(child.enableCalled);
-		assertFalse(child.enableControlsCalled);
-		
+
+		// Expected behavior for starting the parent:
+		// parent started, parent inited, parent enabled (if applicable), parent
+		// controls enabled (if applicable)
+		// child inited (not started), child enabled (if applicable), child
+		// controls enabled (if applicable)
+
+		// Reset the test flags for good measure.
+		composite.resetTestFlags();
+		child.resetTestFlags();
+		// Start the composite and check the behavior.
 		composite.start();
-		
-		assertTrue(child.startCalled);
-		assertTrue(child.wasStarted);
-		assertTrue(child.initCalled);
+		assertTrue(composite.wasStarted);
+		assertFalse(child.wasStarted);
+		assertTrue(composite.wasInited);
 		assertTrue(child.wasInited);
-		assertTrue(child.enableCalled);
+		assertTrue(composite.wasEnabled);
 		assertTrue(child.wasEnabled);
-		assertTrue(child.enableControlsCalled);
+		assertTrue(composite.wasControlsEnabled);
 		assertTrue(child.wasControlsEnabled);
-		
+
+		// Expected behavior for starting the parent with parent disabled and
+		// child controls disabled:
+		// parent started, parent inited, parent not enabled, parent controls
+		// enabled
+		// child inited (not started), child not enabled (not even called),
+		// child controls not enabled (but called)
+		composite.setEnabled(false);
+		child.setControlsEnabled(false);
+
+		// Reset the composite and child for testing purposes.
+		composite.stop();
+		// Reset the test flags for good measure.
+		composite.resetTestFlags();
+		child.resetTestFlags();
+		// Start the composite and check the behavior.
+		composite.start();
+		assertTrue(composite.wasStarted);
+		// assertFalse(child.wasStarted);
+		assertTrue(composite.wasInited);
+		assertTrue(child.wasInited);
+		assertFalse(composite.wasEnabled);
+		assertFalse(child.enableCalled);
+		assertFalse(child.wasEnabled);
+		assertTrue(composite.wasControlsEnabled);
+		assertTrue(child.enableControlsCalled);
+		assertFalse(child.wasControlsEnabled);
+
+		// TODO Try nested children
+
 		return;
 	}
 
