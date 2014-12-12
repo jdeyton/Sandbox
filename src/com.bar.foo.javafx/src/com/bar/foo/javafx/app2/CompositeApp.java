@@ -6,6 +6,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import com.bar.foo.javafx.input.ControlManager;
+
 public abstract class CompositeApp extends App {
 
 	/**
@@ -17,7 +19,7 @@ public abstract class CompositeApp extends App {
 	private final ReadLock appsReadLock;
 
 	// TODO Handle updating, enabling, disabling, etc.
-	
+
 	public CompositeApp() {
 		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 		appsWriteLock = readWriteLock.writeLock();
@@ -74,4 +76,88 @@ public abstract class CompositeApp extends App {
 		return removed;
 	}
 
+	protected void enableAppControls(ControlManager manager) {
+		// The super method is abstract.
+		if (manager != null && controlsEnabled()) {
+			appsReadLock.lock();
+			try {
+				for (App app : apps) {
+					app.enableAppControls(manager);
+				}
+			} finally {
+				appsReadLock.unlock();
+			}
+		}
+		return;
+	}
+
+	@Override
+	protected void disableAppControls(ControlManager manager) {
+		// The super method is abstract.
+		if (manager != null && !controlsEnabled()) {
+			appsReadLock.lock();
+			try {
+				for (App app : apps) {
+					app.disableAppControls(manager);
+				}
+			} finally {
+				appsReadLock.unlock();
+			}
+		}
+		return;
+	}
+
+	@Override
+	protected void enableApp() {
+		// The super method is abstract.
+		if (isEnabled()) {
+			appsReadLock.lock();
+			try {
+				for (App app : apps) {
+					app.enableApp();
+				}
+			} finally {
+				appsReadLock.unlock();
+			}
+		}
+		return;
+	}
+	
+	@Override
+	protected void disableApp() {
+		// The super method is abstract.
+		if (!isEnabled()) {
+			appsReadLock.lock();
+			try {
+				for (App app : apps) {
+					app.disableApp();
+				}
+			} finally {
+				appsReadLock.unlock();
+			}
+		}
+		return;		
+	}
+	
+	// TODO Should we override the init or start method?
+	@Override
+	protected void initApp() {
+		// The super method is abstract.
+		if (isStarting()) {
+			appsReadLock.lock();
+			try {
+				for (App app : apps) {
+					app.initApp();
+				}
+			} finally {
+				appsReadLock.unlock();
+			}
+		}
+		return;		
+	}
+	
+	@Override
+	protected void disposeApp() {
+		
+	}
 }
