@@ -56,8 +56,8 @@ public abstract class CompositeApp extends App {
 	public boolean addApp(App app) {
 		boolean added = false;
 		if (app != null) {
-			appsReadLock.lock();
-			try {
+//			appsReadLock.lock();
+//			try {
 				if (!apps.contains(app)) {
 					appsWriteLock.lock();
 					try {
@@ -67,9 +67,9 @@ public abstract class CompositeApp extends App {
 						appsWriteLock.unlock();
 					}
 				}
-			} finally {
-				appsReadLock.unlock();
-			}
+//			} finally {
+//				appsReadLock.unlock();
+//			}
 		}
 
 		// TODO Start the new app.
