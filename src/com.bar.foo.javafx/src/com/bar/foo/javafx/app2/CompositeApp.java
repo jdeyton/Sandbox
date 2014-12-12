@@ -20,6 +20,25 @@ public abstract class CompositeApp extends App {
 
 	// TODO Handle updating, enabling, disabling, etc.
 
+	protected interface AppRunnable {
+		public boolean run(App app);
+	}
+
+	protected final boolean runOnApps(AppRunnable runnable) {
+		boolean success = (runnable != null);
+		if (success) {
+			appsReadLock.lock();
+			try {
+				for (App app : apps) {
+					success &= runnable.run(app);
+				}
+			} finally {
+				appsReadLock.unlock();
+			}
+		}
+		return success;
+	}
+
 	public CompositeApp() {
 		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 		appsWriteLock = readWriteLock.writeLock();
@@ -52,6 +71,9 @@ public abstract class CompositeApp extends App {
 				appsReadLock.unlock();
 			}
 		}
+
+		// TODO Start the new app.
+
 		return added;
 	}
 
@@ -73,91 +95,137 @@ public abstract class CompositeApp extends App {
 				appsWriteLock.unlock();
 			}
 		}
+
+		// TODO Stop the old app.
+
 		return removed;
 	}
 
-	protected void enableAppControls(ControlManager manager) {
-		// The super method is abstract.
-		if (manager != null && controlsEnabled()) {
-			appsReadLock.lock();
-			try {
-				for (App app : apps) {
-					app.enableAppControls(manager);
+	@Override
+	public boolean start() {
+		boolean changed = false;
+		// Only proceed if the app is currently STOPPED. Mark it as STARTING.
+		if (setStarting()) {
+			changed = true;
+
+			// Call the customizable initialization operation.
+			initApp();
+
+			// Enable the app and its controls as necessary. These may return
+			// false if the app or its controls should not be enabled yet.
+			enableApp();
+			enableAppControls(getControlManager());
+
+			// Start all of the child apps.
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.start();
 				}
-			} finally {
-				appsReadLock.unlock();
-			}
+			});
+
+			// Mark the app as STARTED.
+			setStarted();
 		}
-		return;
+		return changed;
 	}
 
 	@Override
-	protected void disableAppControls(ControlManager manager) {
-		// The super method is abstract.
-		if (manager != null && !controlsEnabled()) {
-			appsReadLock.lock();
-			try {
-				for (App app : apps) {
-					app.disableAppControls(manager);
+	public boolean stop() {
+		boolean changed = false;
+		// Only proceed if the app is currently STARTED. Mark it as STOPPING.
+		if (setStopping()) {
+
+			// Stop all of the child apps.
+			runOnApps(new AppRunnable() {
+				@Override
+				public boolean run(App app) {
+					return app.stop();
 				}
-			} finally {
-				appsReadLock.unlock();
-			}
+			});
+
+			// Disable the app and its controls as necessary. These may return
+			// false if the app or its controls do not need to be disabled.
+			disableAppControls(getControlManager());
+			disableApp();
+
+			// Call the customizable disposal operation.
+			disposeApp();
+
+			// Mark the app as STOPPED.
+			setStopped();
 		}
-		return;
+		return changed;
 	}
 
 	@Override
-	protected void enableApp() {
-		// The super method is abstract.
-		if (isEnabled()) {
-			appsReadLock.lock();
-			try {
-				for (App app : apps) {
-					app.enableApp();
+	public boolean setEnabled(boolean enabled) {
+		// Determine if the value has actually changed, while at the same time
+		// setting it to the new value.
+		boolean changed = false;
+		if (this.enabled.compareAndSet(!enabled, enabled)) {
+			changed = true;
+
+			// We should either enable or disable the app as necessary. These
+			// methods may return false if the app cannot be enabled/disabled.
+			AppRunnable runnable = null;
+			if (enabled) {
+				if (enableApp()) {
+					runnable = new AppRunnable() {
+						@Override
+						public boolean run(App app) {
+							return app.enableApp();
+						}
+					};
 				}
-			} finally {
-				appsReadLock.unlock();
+			} else if (disableApp()) {
+				runnable = new AppRunnable() {
+					@Override
+					public boolean run(App app) {
+						return app.disableApp();
+					}
+				};
 			}
+			// Enable/disable all of the child apps as necessary.
+			runOnApps(runnable);
 		}
-		return;
+		return changed;
 	}
-	
+
 	@Override
-	protected void disableApp() {
-		// The super method is abstract.
-		if (!isEnabled()) {
-			appsReadLock.lock();
-			try {
-				for (App app : apps) {
-					app.disableApp();
+	public boolean setControlsEnabled(boolean enabled) {
+		// Determine if the value has actually changed, while at the same time
+		// setting it to the new value.
+		boolean changed = false;
+		if (controlsEnabled.compareAndSet(!enabled, enabled)) {
+			changed = true;
+
+			// We should either enable or disable the app controls as necessary.
+			// These methods may return false if the app's controls cannot be
+			// enabled/disabled.
+			AppRunnable runnable = null;
+			final ControlManager manager = getControlManager();
+			if (enabled) {
+				if (enableAppControls(manager)) {
+					runnable = new AppRunnable() {
+						@Override
+						public boolean run(App app) {
+							return app.enableAppControls(manager);
+						}
+					};
 				}
-			} finally {
-				appsReadLock.unlock();
+			} else if (disableAppControls(manager)) {
+				runnable = new AppRunnable() {
+					@Override
+					public boolean run(App app) {
+						return app.disableAppControls(manager);
+					}
+				};
 			}
+			// Enable/disable all of the child app controls as necessary.
+			runOnApps(runnable);
 		}
-		return;		
+		return changed;
 	}
-	
-	// TODO Should we override the init or start method?
-	@Override
-	protected void initApp() {
-		// The super method is abstract.
-		if (isStarting()) {
-			appsReadLock.lock();
-			try {
-				for (App app : apps) {
-					app.initApp();
-				}
-			} finally {
-				appsReadLock.unlock();
-			}
-		}
-		return;		
-	}
-	
-	@Override
-	protected void disposeApp() {
-		
-	}
+
 }
