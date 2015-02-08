@@ -1,10 +1,14 @@
 package org.eclipse.ice.client.widgets.jface;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -44,6 +48,7 @@ public class CellEditingSupport extends EditingSupport {
 				editor = getTextCellEditor();
 			} else if (type == CellType.Combo) {
 				editor = getComboCellEditor();
+				((ComboBoxViewerCellEditor) editor).setInput(element);
 			} else if (type == CellType.Button) {
 				editor = getButtonCellEditor();
 			} else if (type == CellType.File) {
@@ -91,6 +96,31 @@ public class CellEditingSupport extends EditingSupport {
 			Composite parent = (Composite) getViewer().getControl();
 			comboCellEditor = new ComboBoxViewerCellEditor(parent,
 					SWT.DROP_DOWN | SWT.READ_ONLY);
+
+			// The underlying ComboViewer must have a JFace content provider.
+			// Applicable methods should be redirected to the
+			// ICellContentProvider.
+			comboCellEditor
+					.setContentProvider(new IStructuredContentProvider() {
+						@Override
+						public void inputChanged(Viewer viewer,
+								Object oldInput, Object newInput) {
+							// Nothing to do.
+						}
+
+						@Override
+						public void dispose() {
+							// Nothing to do.
+						}
+
+						@Override
+						public Object[] getElements(Object inputElement) {
+							List<String> allowedValues = contentProvider
+									.getAllowedValues(inputElement);
+							return allowedValues
+									.toArray(new Object[allowedValues.size()]);
+						}
+					});
 		}
 		return comboCellEditor;
 	}

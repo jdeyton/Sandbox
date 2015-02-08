@@ -9,6 +9,7 @@ import org.eclipse.ice.client.widgets.jface.EntryCellContentProvider;
 import org.eclipse.ice.client.widgets.jface.ICellContentProvider;
 import org.eclipse.ice.datastructures.ICEObject.IUpdateable;
 import org.eclipse.ice.datastructures.ICEObject.IUpdateableListener;
+import org.eclipse.ice.datastructures.form.AllowedValueType;
 import org.eclipse.ice.datastructures.form.Entry;
 import org.eclipse.ice.datastructures.form.TableComponent;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -20,6 +21,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 
+// TODO Update all documentation in this class.
 public class TableComponentContentProvider implements
 		IStructuredContentProvider, IUpdateableListener {
 
@@ -113,7 +115,8 @@ public class TableComponentContentProvider implements
 
 		Object[] elements;
 
-		// Handle the TableComponent.
+		// Handle the table (an instance of TableComponent, which should be the
+		// known TableComponent). It should return rows.
 		if (inputElement == tableComponent) {
 			List<Integer> ids = tableComponent.getRowIds();
 			int size = ids.size();
@@ -122,7 +125,27 @@ public class TableComponentContentProvider implements
 				elements[i] = tableComponent.getRow(i);
 			}
 		}
-		// Return an empty array for anything else.
+		// Handle a row (an instance of ArrayList<Entry>). It should return
+		// Entry instances.
+		else if (inputElement instanceof List<?>) {
+			List<?> list = (List<?>) inputElement;
+			elements = new Object[list.size()];
+			list.toArray(elements);
+		}
+		// Handle the cell (an instance of Entry). It should return either a
+		// list of allowed values or nothing.
+		else if (inputElement instanceof Entry) {
+			Entry entry = (Entry) inputElement;
+			if (entry.getValueType() == AllowedValueType.Discrete) {
+				List<String> allowedValues = entry.getAllowedValues();
+				elements = new Object[allowedValues.size()];
+				allowedValues.toArray(elements);
+			} else {
+				elements = new Object[] {};
+			}
+		}
+		// Return an empty array for anything else. This is the end of the
+		// content (or the input is invalid).
 		else {
 			elements = new Object[] {};
 		}
