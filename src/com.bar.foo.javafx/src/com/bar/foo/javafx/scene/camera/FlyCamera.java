@@ -263,6 +263,33 @@ public class FlyCamera extends Node implements IControlContributor {
 				}
 			});
 
+			controls.keys.addToggle(KeyCode.SPACE, new KeyToggleAction() {
+				@Override
+				public void pressed(float timePerFrame, KeyEvent event) {
+					transform.translation.add(0f, moveRate, 0f);
+					transform.refresh(false);
+				}
+
+				@Override
+				public void released(float timePerFrame, KeyEvent event) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+			controls.keys.addToggle(KeyCode.C, new KeyToggleAction() {
+				@Override
+				public void pressed(float timePerFrame, KeyEvent event) {
+					transform.translation.subtract(0f, moveRate, 0f);
+					transform.refresh(false);
+				}
+
+				@Override
+				public void released(float timePerFrame, KeyEvent event) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+			
 		}
 		return registered;
 	}

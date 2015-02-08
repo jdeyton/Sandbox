@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.bar.foo.javafx.IEnableable;
 import com.bar.foo.javafx.IStartable;
+import com.bar.foo.javafx.app2.CompositeApp.AppRunnable;
 import com.bar.foo.javafx.input.ControlManager;
 import com.bar.foo.javafx.input.IControlProvider;
 
@@ -13,8 +14,8 @@ import com.bar.foo.javafx.input.IControlProvider;
 public abstract class App implements IStartable, IEnableable, IControlProvider {
 
 	private final AtomicInteger startState = new AtomicInteger(0);
-	private final AtomicBoolean enabled = new AtomicBoolean(true);
-	private final AtomicBoolean controlsEnabled = new AtomicBoolean(true);
+	protected final AtomicBoolean enabled = new AtomicBoolean(true);
+	protected final AtomicBoolean controlsEnabled = new AtomicBoolean(true);
 
 	private AtomicReference<ControlManager> controlManager = new AtomicReference<ControlManager>();
 
@@ -27,24 +28,30 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		if (controlsEnabled.compareAndSet(!enabled, enabled)) {
 			changed = true;
 
-			// If the app is currently running and not stupping, and if the
-			// ControlManager is set, then we should either enable or disable
-			// the app's controls.
-			ControlManager manager;
-			if (isStarted() && (manager = getControlManager()) != null) {
-				if (enabled) {
-					enableAppControls(manager);
-				} else {
-					disableAppControls(manager);
-				}
+			// We should either enable or disable the app controls as necessary.
+			// These methods may return false if the app's controls cannot be
+			// enabled/disabled.
+			ControlManager manager = getControlManager();
+			if (enabled) {
+				enableAppControls(manager);
+			} else {
+				disableAppControls(manager);
 			}
 		}
 		return changed;
 	}
 
-	protected abstract void enableAppControls(ControlManager manager);
+	protected boolean canEnableAppControls(ControlManager manager) {
+		return (controlsEnabled() && manager != null && (isStarted() || isStarting()));
+	}
+	
+	protected abstract boolean enableAppControls(ControlManager manager);
 
-	protected abstract void disableAppControls(ControlManager manager);
+	protected boolean canDisableAppControls(ControlManager manager) {
+		return (!controlsEnabled() && manager != null);
+	}
+	
+	protected abstract boolean disableAppControls(ControlManager manager);
 
 	@Override
 	public boolean controlsEnabled() {
@@ -110,22 +117,28 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 		if (this.enabled.compareAndSet(!enabled, enabled)) {
 			changed = true;
 
-			// If the app is currently running and not stopping, we should
-			// either enable or disable the app's customizable features.
-			if (isStarted()) {
-				if (enabled) {
-					enableApp();
-				} else {
-					disableApp();
-				}
+			// We should either enable or disable the app as necessary. These
+			// methods may return false if the app cannot be enabled/disabled.
+			if (enabled) {
+				enableApp();
+			} else {
+				disableApp();
 			}
 		}
 		return changed;
 	}
 
-	protected abstract void enableApp();
+	protected boolean canEnable() {
+		return (isEnabled() && (isStarted() || isStarting()));
+	}
 
-	protected abstract void disableApp();
+	protected abstract boolean enableApp();
+
+	protected boolean canDisable() {
+		return (!isEnabled());
+	}
+
+	protected abstract boolean disableApp();
 
 	@Override
 	public boolean isEnabled() {
@@ -139,58 +152,54 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 	public boolean start() {
 		boolean changed = false;
 		// Only proceed if the app is currently STOPPED. Mark it as STARTING.
-		if (startState.compareAndSet(0, 2)) {
+		if (setStarting()) {
 			changed = true;
 
 			// Call the customizable initialization operation.
 			initApp();
 
-			// If already enabled, we should actually enable the app.
-			if (isEnabled()) {
-				enableApp();
-			}
-			// If the controls are already enabled and the ControlManager is
-			// set, we should actually enable the controls.
-			ControlManager manager;
-			if (controlsEnabled() && (manager = getControlManager()) != null) {
-				enableAppControls(manager);
-			}
+			// Enable the app and its controls as necessary. These may return
+			// false if the app or its controls should not be enabled yet.
+			enableApp();
+			enableAppControls(getControlManager());
 
 			// Mark the app as STARTED.
-			startState.set(1);
+			setStarted();
 		}
 		return changed;
 	}
 
-	protected abstract void initApp();
+	protected boolean canInit() {
+		return isStarting();
+	}
+	
+	protected abstract boolean initApp();
 
 	@Override
 	public boolean stop() {
 		boolean changed = false;
 		// Only proceed if the app is currently STARTED. Mark it as STOPPING.
-		if (startState.compareAndSet(1, 3)) {
+		if (setStopping()) {
 
-			// If the controls are enabled and the ControlManager is set, we
-			// should disable the controls.
-			ControlManager manager;
-			if (controlsEnabled() && (manager = getControlManager()) != null) {
-				disableAppControls(manager);
-			}
-			// If enabled, we should disable the app.
-			if (isEnabled()) {
-				disableApp();
-			}
+			// Disable the app and its controls as necessary. These may return
+			// false if the app or its controls do not need to be disabled.
+			disableAppControls(getControlManager());
+			disableApp();
 
 			// Call the customizable disposal operation.
 			disposeApp();
 
 			// Mark the app as STOPPED.
-			startState.set(0);
+			setStopped();
 		}
 		return changed;
 	}
 
-	protected abstract void disposeApp();
+	protected boolean canDispose() {
+		return isStopping();
+	}
+	
+	protected abstract boolean disposeApp();
 
 	@Override
 	public boolean isStarted() {
@@ -205,6 +214,22 @@ public abstract class App implements IStartable, IEnableable, IControlProvider {
 	@Override
 	public boolean isStopping() {
 		return startState.get() == 3;
+	}
+
+	protected boolean setStarting() {
+		return startState.compareAndSet(0, 2);
+	}
+
+	protected boolean setStarted() {
+		return startState.compareAndSet(2, 1);
+	}
+
+	protected boolean setStopping() {
+		return startState.compareAndSet(1, 3);
+	}
+
+	protected boolean setStopped() {
+		return startState.compareAndSet(3, 0);
 	}
 
 	// ------------------------------- //

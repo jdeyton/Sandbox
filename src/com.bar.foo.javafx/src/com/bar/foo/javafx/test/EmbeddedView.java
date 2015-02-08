@@ -72,8 +72,8 @@ public class EmbeddedView implements IFrameRateManager {
 		// Add the camera to the root node so it can move.
 		root.getChildren().add(camera);
 		// Move the camera out towards the user and to the right.
-//		camera.setPosition(new Vector3f(0f, 0f, 1000f));
-//		camera.setOrientation(new Vector3f(0f, 0f, -1f), Vector3f.UNIT_Y);
+		camera.setPosition(new Vector3f(0f, 0f, 1000f));
+		camera.setOrientation(new Vector3f(0f, 0f, -1f), Vector3f.UNIT_Y);
 
 		if (parent != null) {
 			// Note: This is a lazy way to pass execution to the render thread.
