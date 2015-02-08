@@ -7,7 +7,6 @@ import org.eclipse.ice.client.widgets.jface.table.TableViewComposite;
 import org.eclipse.ice.datastructures.form.AllowedValueType;
 import org.eclipse.ice.datastructures.form.BasicEntryContentProvider;
 import org.eclipse.ice.datastructures.form.Entry;
-import org.eclipse.ice.datastructures.form.IEntryContentProvider;
 import org.eclipse.ice.datastructures.form.TableComponent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -55,7 +54,7 @@ public class Launcher {
 		table.setDescription("Table Description");
 		
 		Entry column;
-		IEntryContentProvider contentProvider;
+		BasicEntryContentProvider contentProvider;
 		List<String> allowedValues;
 		
 		List<Entry> template = new ArrayList<Entry>();
@@ -63,7 +62,7 @@ public class Launcher {
 		contentProvider = new BasicEntryContentProvider();
 		contentProvider.setDefaultValue("default");
 		column = new Entry(contentProvider);
-		column.setName("Column One");
+		column.setName("Basic Text Entry");
 		template.add(column);
 		
 		contentProvider = new BasicEntryContentProvider();
@@ -75,7 +74,26 @@ public class Launcher {
 		allowedValues.add("Three");
 		contentProvider.setAllowedValues((ArrayList<String>) allowedValues);
 		column = new Entry(contentProvider);
-		column.setName("Column Two");
+		column.setName("Discrete Entry");
+		template.add(column);
+		
+		contentProvider = new BasicEntryContentProvider();
+		contentProvider.setDefaultValue("No File");
+		contentProvider.setAllowedValueType(AllowedValueType.File);
+		column = new Entry(contentProvider);
+		column.setName("File Entry");
+		template.add(column);
+		
+		contentProvider = new BasicEntryContentProvider();
+		contentProvider.setDefaultValue("No File");
+		contentProvider.setAllowedValueType(AllowedValueType.File);
+		allowedValues = new ArrayList<String>();
+		allowedValues.add("No File");
+		allowedValues.add("File One");
+		allowedValues.add("File Two");
+		contentProvider.setAllowedValues((ArrayList<String>) allowedValues);
+		column = new Entry(contentProvider);
+		column.setName("Combo File Entry");
 		template.add(column);
 		
 		table.setRowTemplate((ArrayList<Entry>) template);

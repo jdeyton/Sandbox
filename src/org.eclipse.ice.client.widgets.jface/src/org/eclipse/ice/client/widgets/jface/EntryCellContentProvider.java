@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.ice.datastructures.form.AllowedValueType;
 import org.eclipse.ice.datastructures.form.Entry;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
 public class EntryCellContentProvider implements ICellContentProvider {
@@ -94,20 +93,20 @@ public class EntryCellContentProvider implements ICellContentProvider {
 		CellType type = CellType.Text;
 
 		if (isValid(element)) {
-			AllowedValueType entryType = ((Entry) element).getValueType();
+			Entry entry = (Entry) element;
+			AllowedValueType entryType = entry.getValueType();
 			if (entryType == AllowedValueType.Discrete) {
 				type = CellType.Combo;
 			} else if (entryType == AllowedValueType.File) {
-				type = CellType.File;
+				if (entry.getAllowedValues().isEmpty()) {
+					type = CellType.File;
+				} else {
+					type = CellType.ComboFile;
+				}
 			}
 		}
 
 		return type;
-	}
-
-	@Override
-	public int[] getCellStyles(Object element) {
-		return new int[] { SWT.NONE };
 	}
 
 }

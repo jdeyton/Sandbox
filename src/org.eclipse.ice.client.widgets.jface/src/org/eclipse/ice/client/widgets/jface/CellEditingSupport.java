@@ -18,9 +18,9 @@ public class CellEditingSupport extends EditingSupport {
 
 	private TextCellEditor textCellEditor;
 	private ComboBoxViewerCellEditor comboCellEditor;
-	private CellEditor buttonCellEditor;
-	private CellEditor fileCellEditor;
-	private CellEditor comboFileCellEditor;
+	private ButtonCellEditor buttonCellEditor;
+	private FileCellEditor fileCellEditor;
+	private ComboFileCellEditor comboFileCellEditor;
 
 	public CellEditingSupport(ColumnViewer viewer,
 			ICellContentProvider contentProvider) {
@@ -48,6 +48,7 @@ public class CellEditingSupport extends EditingSupport {
 				editor = getTextCellEditor();
 			} else if (type == CellType.Combo) {
 				editor = getComboCellEditor();
+				// Since there is a JFace viewer here, we have to set its input.
 				((ComboBoxViewerCellEditor) editor).setInput(element);
 			} else if (type == CellType.Button) {
 				editor = getButtonCellEditor();
@@ -55,6 +56,8 @@ public class CellEditingSupport extends EditingSupport {
 				editor = getFileCellEditor();
 			} else if (type == CellType.ComboFile) {
 				editor = getComboFileCellEditor();
+				// Since there is a JFace viewer here, we have to set its input.
+				((ComboBoxViewerCellEditor) editor).setInput(element);
 			} else {
 				editor = getTextCellEditor();
 			}
@@ -96,53 +99,68 @@ public class CellEditingSupport extends EditingSupport {
 			Composite parent = (Composite) getViewer().getControl();
 			comboCellEditor = new ComboBoxViewerCellEditor(parent,
 					SWT.DROP_DOWN | SWT.READ_ONLY);
-
 			// The underlying ComboViewer must have a JFace content provider.
-			// Applicable methods should be redirected to the
-			// ICellContentProvider.
-			comboCellEditor
-					.setContentProvider(new IStructuredContentProvider() {
-						@Override
-						public void inputChanged(Viewer viewer,
-								Object oldInput, Object newInput) {
-							// Nothing to do.
-						}
-
-						@Override
-						public void dispose() {
-							// Nothing to do.
-						}
-
-						@Override
-						public Object[] getElements(Object inputElement) {
-							List<String> allowedValues = contentProvider
-									.getAllowedValues(inputElement);
-							return allowedValues
-									.toArray(new Object[allowedValues.size()]);
-						}
-					});
+			comboCellEditor.setContentProvider(createComboContentProvider());
 		}
 		return comboCellEditor;
 	}
 
-	protected CellEditor getButtonCellEditor() {
+	protected ButtonCellEditor getButtonCellEditor() {
 		if (buttonCellEditor == null) {
-			// TODO
+			Composite parent = (Composite) getViewer().getControl();
+			buttonCellEditor = new ButtonCellEditor(parent, SWT.CHECK);
 		}
 		return buttonCellEditor;
 	}
 
-	protected CellEditor getFileCellEditor() {
+	protected FileCellEditor getFileCellEditor() {
 		if (fileCellEditor == null) {
-			// TODO
+			Composite parent = (Composite) getViewer().getControl();
+			fileCellEditor = new FileCellEditor(parent);
 		}
 		return fileCellEditor;
 	}
 
-	protected CellEditor getComboFileCellEditor() {
+	protected ComboFileCellEditor getComboFileCellEditor() {
 		if (comboFileCellEditor == null) {
-			// TODO
+			Composite parent = (Composite) getViewer().getControl();
+			comboFileCellEditor = new ComboFileCellEditor(parent);
+			// The underlying ComboViewer must have a JFace content provider.
+			comboFileCellEditor
+					.setContentProvider(createComboContentProvider());
 		}
 		return comboFileCellEditor;
+	}
+
+	/**
+	 * Creates a content provider for underlying JFace viewers. For these
+	 * viewers, it is assumed that the input element is the same type of element
+	 * managed by the cell's {@link #contentProvider}. Thus, the created content
+	 * provider redirects any applicable methods to the cell's
+	 * {@link #contentProvider}.
+	 * 
+	 * @return A new {@code IStructuredContentProvider} that references the
+	 *         {@link #contentProvider}.
+	 */
+	private IStructuredContentProvider createComboContentProvider() {
+		return new IStructuredContentProvider() {
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput,
+					Object newInput) {
+				// Nothing to do.
+			}
+
+			@Override
+			public void dispose() {
+				// Nothing to do.
+			}
+
+			@Override
+			public Object[] getElements(Object inputElement) {
+				List<String> allowedValues = contentProvider
+						.getAllowedValues(inputElement);
+				return allowedValues.toArray(new Object[allowedValues.size()]);
+			}
+		};
 	}
 }

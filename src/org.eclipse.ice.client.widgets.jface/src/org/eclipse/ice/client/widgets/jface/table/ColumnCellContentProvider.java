@@ -99,9 +99,4 @@ public class ColumnCellContentProvider implements ICellContentProvider {
 		return contentProvider.getCellType(getIndexedElement(element));
 	}
 
-	@Override
-	public int[] getCellStyles(Object element) {
-		return contentProvider.getCellStyles(getIndexedElement(element));
-	}
-
 }

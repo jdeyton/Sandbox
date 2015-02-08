@@ -47,6 +47,4 @@ public interface ICellContentProvider {
 	public boolean setValue(Object element, Object value);
 
 	public CellType getCellType(Object element);
-
-	public int[] getCellStyles(Object element);
 }
