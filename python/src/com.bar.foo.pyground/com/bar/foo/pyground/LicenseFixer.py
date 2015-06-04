@@ -330,7 +330,7 @@ class LicenseFixer():
         # Replace all leading asterisks. We shouldn't destroy empty lines, hence
         # the \n is omitted from the second amount of whitespace characters.
         regex = re.compile('^\s*\*+[ \t\r\f\v]*', re.MULTILINE)
-        for i in range(len(self._commentBlocks) - 1):
+        for i in range(len(self._commentBlocks)):
             self._commentBlocks[i] = regex.sub('', self._commentBlocks[i])
         
         return
@@ -357,9 +357,44 @@ class LicenseFixer():
                 if len(result.groups()) == 3:
                     self._existingDateList.append(int(result.group(3)))
         
-        # TODO Find the authors for the @author tags.
-#         for commentBlock in self._commentBlocks:
-#             tagSplit = commentBlock.sp
+        # Print the found dates to the debug log.
+        if len(self._existingDateList) == 0:
+            log.debug('Found no existing copyright date.')
+        else:
+            log.debug('Found existing copyright dates: {0}'.format(self._existingDateList))
+        
+        # Find the authors for the @author tags.
+        regex = re.compile('^author')
+        for commentBlock in self._commentBlocks:
+            # Split the comment block into sections by @ tags.
+            tagSplit = commentBlock.split('@')
+            # Process each section after an @ sign where the first string is 
+            # 'author' (this is in the pre-compiled regex).
+            for i in range(1, len(tagSplit)):
+                tagBlock = tagSplit[i]
+                result = regex.match(tagBlock)
+                # An author tag was found!
+                if result:
+                    # Ignore the 'author' part of the tag "block".
+                    authors = tagBlock.split()
+                    authors.pop(0)
+                    # Replaces all whitespace with a single space.
+                    authors = ' '.join(authors).split(',')
+                    # Loops over each found author and either adds their 
+                    # preferred name or the trimmed name to the set of existing 
+                    # authors.
+                    for author in authors:
+                        author = author.strip()
+                        if author in self._authorDictionary:
+                            self._existingAuthorSet.add(self._authorDictionary[author])
+                        else:
+                            self._existingAuthorSet.add(author)
+        
+        # Print the found authors to the debug log.
+        if len(self._existingAuthorSet) == 0:
+            log.debug('Found no existing authors from author tags.')
+        else:
+            log.debug('Found existing authors from author tags: {0}'.format(self._existingAuthorSet))
         
         return
     
