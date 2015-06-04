@@ -25,9 +25,12 @@ import os.path
 import logging as log
 # Import the regex library.
 import re
+# Used for running git commands and getting their output.
+import subprocess
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
+from datetime import datetime
 
 __all__ = []
 __version__ = 0.1
@@ -264,9 +267,8 @@ class LicenseFixer():
         
         # Gather all possible metadata from the file and its git history.
         self._findDocMetadata(path)
-        return
         self._findGitMetadata(path)
-    
+        
         # Determine the substitutions that need to go in the license text.
         dates = self._getDates()
         copyrightOwners = self._getCopyrightOwners()
@@ -324,7 +326,7 @@ class LicenseFixer():
         # into memory. Although this is (at least currently) highly unusual for 
         # a source file to be beyond a few thousand lines.
         with open(path, 'r') as f:
-            self._commentBlocks = re.findall('\/\*+(.*?)\*+\/', f.read(), re.DOTALL)    
+            self._commentBlocks = re.findall('/\*+(.*?)\*+/', f.read(), re.DOTALL)    
         file.closed
         
         # Replace all leading asterisks. We shouldn't destroy empty lines, hence
@@ -411,12 +413,52 @@ class LicenseFixer():
         self._authorSet = set()
         self._isOld = False
         
-        # TODO
-        self._dateList.append(2014)
-        self._dateList.append(2015)
-        self._authorSet.add(self._authorDictionary['Jay Billings'])
-        self._authorSet.add(self._authorDictionary['Jordan Deyton'])
-        self._isOld = True
+        # Call git log on the file. We need to pass --pretty=format:"%ci,%an" to
+        # get the log output in a simple format: yyyy-mm-dd -gmtdiff,<author>
+        directory = path[:path.rfind(os.sep)]
+        result = subprocess.check_output(['git', '-C', directory, 'log', '--pretty=format:"%ci,%an"', path], stderr=subprocess.STDOUT)
+        
+        commits = result.replace('"', '').splitlines()        
+        
+        # Determine the years for the first and last commits.
+        commit = commits[0]
+        lastYear = int(commit[:commit.find('-')])
+        commit = commits[len(commits) - 1]
+        firstYear = int(commit[:commit.find('-')])
+        # Update self._dateList to hold the first (and last year if different).
+        self._dateList.append(firstYear)
+        if firstYear != lastYear:
+            self._dateList.append(lastYear)
+        
+        # Print the found first/last date(s) to the log.
+        log.debug('Found the dates from the git history: {0}'.format(self._dateList))
+        
+        # Determine whether the file is old.
+        firstDateString = commit.split()[0].split('-')
+        firstMonth = int(firstDateString[1])
+        firstDay = int(firstDateString[2])
+        if datetime(firstYear, firstMonth, firstDay) < datetime(2014, 11, 4):
+            self._isOld = True
+        
+        # Print out whether or not the file is old to the log.
+        if self._isOld:
+            log.debug('The file predates the repo relocation.')
+        else:
+            log.debug('The file is more recent than the repo relocation.')
+        
+        # Add all authors from the commit log to the set of authors. Use the 
+        # preferred name if available.
+        authorSet = set()
+        for commit in commits:
+            authorSet.add(commit.split(',')[1])
+        for author in authorSet:
+            if author in self._authorDictionary:
+                self._authorSet.add(self._authorDictionary[author])
+            else:
+                self._authorSet.add(author)
+        
+        # Print out the added authors to the log.
+        log.debug('Found authors from the git history: {0}'.format(self._authorSet))
         
         return
     
