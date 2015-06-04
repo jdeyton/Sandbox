@@ -92,6 +92,8 @@ class LicenseFixer():
     
     _charLimit = 80
     
+    _commentBlocks = None
+    
     def __init__(self, licenseFile, authorsFile, contributorsFile):
         '''
         Constructs a new LicenseFixer instance.
@@ -201,7 +203,7 @@ class LicenseFixer():
         log.debug('Authors: {0} authors, {1} total names.'.format(authorCount, len(authorDictionary)))
         
         self._authorDictionary = authorDictionary
-        self._employerDictionary = {} # TODO
+        self._employerDictionary = {}  # TODO
         
         return authorDictionary
     
@@ -255,10 +257,14 @@ class LicenseFixer():
         log.debug('Generating license for file:{0}'.format(path))
         
         # The line separator. This is useful in various places in this method.
-        sep = '\n' #os.linesep
+        sep = '\n'  # os.linesep
+        
+        # Grab all of the comments from the file.
+        self._findComments(path)
         
         # Gather all possible metadata from the file and its git history.
         self._findDocMetadata(path)
+        return
         self._findGitMetadata(path)
     
         # Determine the substitutions that need to go in the license text.
@@ -304,24 +310,57 @@ class LicenseFixer():
         
         return licenseText
     
+    def _findComments(self, path):
+        '''
+        Finds all comment blocks and places them (excluding the comment opener, 
+        line openers (if present), and the comment ender) as separate strings, 
+        one for each block, in self._commentBlocks
+        @param path: The path to the source file in question.
+        @return: Nothing. _commentBlocks is modified.
+        '''
+        
+        # Opens the file and searches for all content in multiline comments. 
+        # Note: This is potentially dangerous as the files contents are read 
+        # into memory. Although this is (at least currently) highly unusual for 
+        # a source file to be beyond a few thousand lines.
+        with open(path, 'r') as f:
+            self._commentBlocks = re.findall('\/\*+(.*?)\*+\/', f.read(), re.DOTALL)    
+        file.closed
+        
+        # Replace all leading asterisks. We shouldn't destroy empty lines, hence
+        # the \n is omitted from the second amount of whitespace characters.
+        regex = re.compile('^\s*\*+[ \t\r\f\v]*', re.MULTILINE)
+        for i in range(len(self._commentBlocks) - 1):
+            self._commentBlocks[i] = regex.sub('', self._commentBlocks[i])
+        
+        return
+    
     def _findDocMetadata(self, path):
         '''
         Constructs all metadata that can be obtained from the specified file's
         existing documentation. This includes clearing and updating 
         _existingDateList and _existingAuthorSet.
-        @param path: The path to the file whose git history will be queried.
+        @param path: The path to the file whose documentation will be scanned.
         @return: Nothing. _existingDateList and _existingAuthorSet are modified.
         '''
         # Clear out the previous metadata.
         self._existingDateList = []
         self._existingAuthorSet = set()
         
-        # TODO
-        self._existingDateList.append(2012)
-        self._existingDateList.append(2014)
-        self._existingAuthorSet.add(self._authorDictionary['Anna Wojtowicz'])
-        self._existingAuthorSet.add(self._authorDictionary['Alex McCaskey'])
-                
+        # If the header comment contains the copyright date info, try to get the
+        # first (and last year, if available) from it.
+        if len(self._commentBlocks) > 0:
+            headerComment = self._commentBlocks[0]
+            result = re.match('^.*Copyright.*?\s+(\d{4})(,\s*(\d{4}))?.*$', headerComment, re.MULTILINE)
+            if result:
+                self._existingDateList.append(int(result.group(1)))
+                if len(result.groups()) == 3:
+                    self._existingDateList.append(int(result.group(3)))
+        
+        # TODO Find the authors for the @author tags.
+#         for commentBlock in self._commentBlocks:
+#             tagSplit = commentBlock.sp
+        
         return
     
     def _findGitMetadata(self, path):
