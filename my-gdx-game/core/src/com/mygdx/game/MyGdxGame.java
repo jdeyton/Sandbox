@@ -25,24 +25,27 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0, 0, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		resizeSprite();
 
-		int windowWidth = Gdx.graphics.getWidth();
-		int windowHeight = Gdx.graphics.getHeight();
-		
-		// Size of the sprite should be 80% of the screen width.
-		float spriteWidth = windowWidth * 0.8f;
-		float spriteHeight = windowHeight * 0.8f;
-		// Bottom-left corner of the sprite... Sprite should be centered.
-		float x = windowWidth * 0.1f;
-		float y = windowHeight * 0.1f;
+		return;
+	}
+	
+	private void resizeSprite() {
+		// Size the sprite to 80% of the smaller of window width or height.
+		final int windowWidth = Gdx.graphics.getWidth();
+		final int windowHeight = Gdx.graphics.getHeight();
+		float spriteSize = windowWidth < windowHeight ? windowWidth : windowHeight;
+		spriteSize *= 0.8;
+		// Get the location of the bottom-left corner of the sprite.
+		final float x = (windowWidth - spriteSize) * 0.5f;
+		final float y = (windowHeight - spriteSize) * 0.5f;
 
 		// Update the sprite's "camera" to adjust for the current screen size.
-		batch.getProjectionMatrix().setToOrtho2D(0f, 0f, windowWidth,
-				windowHeight);
+		batch.getProjectionMatrix().setToOrtho2D(0f, 0f, windowWidth, windowHeight);
 
 		// Update the sprite.
 		batch.begin();
-		sprite.setBounds(x, y, spriteWidth, spriteHeight);
+		sprite.setBounds(x, y, spriteSize, spriteSize);
 		sprite.draw(batch);
 		batch.end();
 		
