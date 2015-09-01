@@ -5,6 +5,7 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.StarterApp;
 
 public class DesktopLauncher {
 
@@ -27,6 +28,7 @@ public class DesktopLauncher {
 		// not be jittery.
 		config.backgroundFPS = 30;
 
-		new LwjglApplication(new MyGdxGame(), config);
+//		new LwjglApplication(new MyGdxGame(), config);
+		new LwjglApplication(new StarterApp(), config);
 	}
 }
